@@ -51,7 +51,7 @@ use work.arp_types.all;
 
 entity ethernet_core_wrapper is
   port (
-    -- asynchronous reset
+    --! asynchronous reset
     GLBL_RST          : in  std_logic;
 
     -- input clocks from generator
@@ -90,23 +90,24 @@ entity ethernet_core_wrapper is
     -- Main example design controls
     -------------------------------
     DISPLAY           : out std_logic_vector (7 downto 0);
-    RX_PKG_CTR        : out std_logic_vector (31 downto 0); -- pipe the package counter to the LCD
+    RX_PKG_CTR        : out std_logic_vector (31 downto 0); 		--! pipe the package counter to the LCD
 
-    REGISTER_ACCESS         : out std_logic;            -- a request to access the register
-    REGISTER_ADDR           : out std_logic_vector(15 downto 0);  -- register address byte
-    REGISTER_WRITE_OR_READ  : out std_logic;            -- should we write: '1'  or read: '0'
-    REGISTER_READ_DATA      : in  std_logic_vector(31 downto 0);  -- data word for reading
-    REGISTER_READ_READY     : in  std_logic;            -- register data is ready
-    REGISTER_WRITE_DATA     : out std_logic_vector(31 downto 0);  -- data word for writing
-    REGISTER_DMA            : out std_logic;            -- we want to access the DMA FIFO
-    REGISTER_DMA_WAIT       : out std_logic;            -- wait a second with reading DMA, we need to do something
-    REGISTER_DMA_END        : in  std_logic;            -- the DMA reading has ended
-    REGISTER_DMA_EMPTY      : in  std_logic;            -- the DMA is empty
-    REGISTER_DMA_COUNT      : in  std_logic_vector(17 downto 0);  -- how many words are in the DMA buffer?
+    REGISTER_ACCESS         : out std_logic;            				--! a request to access the register
+    REGISTER_ADDR           : out std_logic_vector(15 downto 0);  --! register address byte
+    REGISTER_WRITE_OR_READ  : out std_logic;            				--! should we write: '1'  or read: '0'
+    REGISTER_READ_DATA      : in  std_logic_vector(31 downto 0);  --! data word for reading
+    REGISTER_READ_DATA_DMA  : in  std_logic_vector(39 downto 0);  --! data word for reading via dma 
+	 REGISTER_READ_READY     : in  std_logic;            				--! register data is ready
+    REGISTER_WRITE_DATA     : out std_logic_vector(31 downto 0);  --! data word for writing
+    REGISTER_DMA            : out std_logic;            				--! we want to access the DMA FIFO
+    REGISTER_DMA_WAIT       : out std_logic;            				--! wait a second with reading DMA, we need to do something
+    REGISTER_DMA_END        : in  std_logic;            				--! the DMA reading has ended
+    REGISTER_DMA_EMPTY      : in  std_logic;            				--! the DMA is empty
+    REGISTER_DMA_COUNT      : in  std_logic_vector(17 downto 0);  --! how many words are in the DMA buffer?
     REGISTER_CLK            : in  std_logic
 
   );
-end ethernet_core_wrapper;
+end ethernet_core_wrapper; 
 
 architecture Behavorial of ethernet_core_wrapper is
 
@@ -328,7 +329,7 @@ architecture Behavorial of ethernet_core_wrapper is
   signal pause_req                : std_logic;
   signal pause_val                : std_logic_vector(15 downto 0);
 
-
+	signal tx_data_count : std_logic_vector(2 downto 0):= "000";
 
   -- signal tie offs
   constant tx_ifg_delay           : std_logic_vector(7 downto 0) := (others => '0');    -- not used in this example
@@ -388,6 +389,7 @@ architecture Behavorial of ethernet_core_wrapper is
   signal nextpkg_count						: unsigned (7 downto 0) := x"00";--wait few clock cycles for the next package to prevent tx errors
 
   signal tx_count             : unsigned (15 downto 0) := x"0000";
+  signal tx_count_old			: unsigned (15 downto 0) := x"0000";
   signal waiting_for_write_count    : unsigned (11 downto 0) := x"000";
   signal timeout_for_waiting_count  : unsigned (7 downto 0) := x"00";
   signal rx_pkg_ctr_int       : std_logic_vector(31 downto 0);  -- how many UDP packages were received?
@@ -401,25 +403,26 @@ architecture Behavorial of ethernet_core_wrapper is
   constant dma_reply			   	: std_logic_vector(7 downto 0) := x"22";
   constant dma_last_reply				: std_logic_vector(7 downto 0) := x"23";
   signal dma_what_to_reply      	: std_logic_vector(7 downto 0) := x"23";
-  signal dma_reply_additional_information	   : std_logic_vector(23 downto 0) := x"000000"; -- counts the number of packages 
+  signal dma_reply_additional_information	   : std_logic_vector(31 downto 0) := x"00000000"; -- counts the number of packages 
 	
 
   -- control signals
-  signal next_state           : state_type;
-  signal set_state            : std_logic;
-  signal set_rx_count         : count_mode_type;
+  signal next_state           			: state_type;
+  signal set_state            			: std_logic;
+  signal set_rx_count         			: count_mode_type;
   signal set_nextpkg_count					: count_mode_type;
+  signal set_tx_data_count					: count_mode_type;
   signal set_dma_reply_additional_information		: count_mode_type;
-  signal set_tx_count         : count_mode_type;
-  signal set_timeout_for_waiting_count  : count_mode_type;
-  signal set_waiting_for_write_count    : count_mode_type;
-  signal set_pkg_count        : count_mode_type;
-  signal set_hdr              : std_logic;
-  signal set_tx_start         : set_clr_type;
-  signal set_last             : std_logic;
+  signal set_tx_count         			: count_mode_type;
+  signal set_timeout_for_waiting_count : count_mode_type;
+  signal set_waiting_for_write_count   : count_mode_type;
+  signal set_pkg_count        			: count_mode_type;
+  signal set_hdr              			: std_logic;
+  signal set_tx_start         			: set_clr_type;
+  signal set_last             			: std_logic;
 --  signal set_tx_started       : set_clr_type;
-  signal set_tx_fin           : set_clr_type;
-  signal control_int          : udp_control_type;
+  signal set_tx_fin           			: set_clr_type;
+  signal control_int          			: udp_control_type;
   signal set_timeout_for_waiting_exeeded  : std_logic;
 
   -- control what we should do
@@ -466,8 +469,8 @@ architecture Behavorial of ethernet_core_wrapper is
 --  signal register_dma_is_empty    : std_logic;
   -- signal register_dma_access_init : std_logic;
   signal fifo_dma_reset           : std_logic;
-  signal fifo_dma_din             : std_logic_vector(31 downto 0);
-  signal fifo_dma_dout            : std_logic_vector(31 downto 0);
+  signal fifo_dma_din             : std_logic_vector(39 downto 0);
+  signal fifo_dma_dout            : std_logic_vector(39 downto 0);
   signal fifo_dma_write_en        : std_logic;
   signal fifo_dma_read_en         : std_logic;
   signal fifo_dma_full            : std_logic;
@@ -487,13 +490,11 @@ architecture Behavorial of ethernet_core_wrapper is
   signal keep_register_addr       : std_logic;
   signal more_than_one_pkg   		 : std_logic;
 
-
   ------------------------------------------------------------------------------
   -- Begin architecture
   ------------------------------------------------------------------------------
 
 begin
-
 
   -----------------
   -- global reset
@@ -763,7 +764,6 @@ begin
     --------------------------
     pause_req             => pause_req,
     pause_val             => pause_val,
-
     -- GMII Interface
     -------------------
     gmii_txd              => gmii_txd,
@@ -777,31 +777,21 @@ begin
     gmii_col              => gmii_col,
     gmii_crs              => gmii_crs,
     mii_tx_clk            => mii_tx_clk,
-
-
     -- asynchronous reset
     glbl_rstn             => glbl_rst_intn,
     rx_axi_rstn           => '1',
     tx_axi_rstn           => '1'
-
   );
 
-
-
 -- ========================================================================================
 -- ========================================================================================
 -- ========================================================================================
 -- ========================================================================================
 -- ========================================================================================
-
-
-
 
   ------------------------------------------------------------------------------
   --  Instantiate the UDP and ARP modules
   ------------------------------------------------------------------------------
-
-
 
   udp_block: UDP_Complete_nomac
   generic map (
@@ -841,8 +831,6 @@ begin
     mac_rx_tlast      => rx_axis_fifo_tlast
   );
 
-
-
   Test_Display : entity work.led_eine_sec
   port map (
     CLK       => gtx_clk_bufg,
@@ -866,9 +854,6 @@ begin
 
   end process;
 
-
-
-
   -- AUTO TX process - on receipt of any UDP pkt, send a response. data sent is modified if a broadcast was received.
 
   -- TX response process - COMB
@@ -877,7 +862,7 @@ begin
     udp_rx_start_int, udp_rx_int, udp_tx_data_out_ready_int, udp_tx_result_int, ip_rx_hdr_int,
     udp_tx_int.data.data_out_valid, what_to_do, tx_count_target, timeout_for_waiting_count,
     register_access_int, register_read_data_int, REGISTER_READ_READY,
-    fifo_dma_dout, fifo_dma_empty,
+    fifo_dma_dout, fifo_dma_empty,register_dma_count, more_than_one_pkg,dma_what_to_reply,
     -- state
     state, rx_count, nextpkg_count, dma_reply_additional_information, tx_count, tx_hdr, tx_start_reg, tx_fin_reg,
     waiting_for_write_count, rx_pkg_ctr_int,
@@ -900,6 +885,7 @@ begin
 	 set_nextpkg_count <= HOLD;
 	 set_dma_reply_additional_information <= HOLD;
     set_tx_count <= HOLD;
+	 set_tx_data_count <= HOLD;
     set_waiting_for_write_count <= HOLD;
     set_timeout_for_waiting_count <= HOLD;
     set_hdr <= '0';
@@ -937,7 +923,6 @@ begin
 	 set_next_register_read_dma_cnt <= '0';
 	 keep_register_addr <= '0';
 
-
     -- FSM
     case state is
 
@@ -954,6 +939,7 @@ begin
 			 set_dma_reply_additional_information <= RST;
           set_rx_count <= RST;
           set_tx_count <= RST;
+			 set_tx_data_count <= RST;
           set_waiting_for_write_count <= RST;
           set_timeout_for_waiting_count <= RST;
           if udp_rx_int.data.data_in_last = '1' then
@@ -964,7 +950,6 @@ begin
             set_state <= '1';
           end if;
         end if;
-
 
       when WAIT_RX_DONE =>
         -- wait until RX pkt fully received
@@ -999,25 +984,21 @@ begin
               -- first two bytes of the address are always 0 (x04 and x05)
               when x"05"  => set_register_addr1 <= '1';
               when x"06"  => set_register_addr2 <= '1';
-							-- first two bytes of the read count are always 0 (x07 and x08) //32 bit now
-							
+							-- first two bytes of the read count are always 0 (x07 and x08) //32 bit now		
 				  when x"07"	=> set_register_read_dma_cnt1 <= '1';
 				  when x"08"	=> set_register_read_dma_cnt2 <= '1';
 				  when x"09"	=> set_register_read_dma_cnt3 <= '1';
 				  when x"0a"	=> set_register_read_dma_cnt4 <= '1';-- set_register_access <= '1';
 				  when others =>  -- do nothing
-
             end case;
           end if;
-
         end if;
 
         if udp_rx_int.data.data_in_last = '1' then
           next_state <= WAIT_DATA_OUT_RDY;
           set_state <= '1';
         end if;
-
-
+		  
       when WAIT_DATA_OUT_RDY =>
         continue_to_send_data := '0';
 
@@ -1077,7 +1058,6 @@ begin
           next_state <= DATA_OUT;
           set_state <= '1';
         end if;
-
 
       when DATA_OUT =>
         if udp_tx_result_int = UDPTX_RESULT_ERR then
@@ -1147,8 +1127,6 @@ begin
 							when others => udp_tx_int.data.data_out <= (others => '0');
 						end case;
 
-
-
               when do_pkg_count_reset =>
                 set_pkg_count <= RST;
                 if ( tx_count = 0 ) then
@@ -1163,43 +1141,41 @@ begin
         --        if ( register_dma_is_empty = '1' ) then
         --          -- no data available
         --          udp_tx_int.data.data_out <= x"ee";
-                else
+                  else
 					 	 dma_what_to_reply <= dma_last_reply;
 							end if;
-							
+
 								case tx_count(15 downto 0) is
-									when x"0000" => 
-											udp_tx_int.data.data_out <= dma_what_to_reply;
-									when x"0001" => 
+									when x"0000" => -- 0000
+											udp_tx_int.data.data_out <= dma_what_to_reply;  -- sets first 8 byte (header)
+									when x"0001" => -- 0001
+											udp_tx_int.data.data_out <= dma_reply_additional_information(31 downto 24);
+									when x"0002" => -- 0010
 											udp_tx_int.data.data_out <= dma_reply_additional_information(23 downto 16);
-									when x"0002" => 
+									when x"0003" => -- 0011
 											udp_tx_int.data.data_out <= dma_reply_additional_information(15 downto 8);
-									when x"0003" => 
+									when x"0004" => -- 0100
 											udp_tx_int.data.data_out <= dma_reply_additional_information(7 downto 0);
 									when others =>    
-
 					 
-                  case tx_count(1 downto 0) is
-                    when "00" =>
-                        udp_tx_int.data.data_out <= fifo_dma_dout(31 downto 24);
-
-                    when "01" =>
-                        udp_tx_int.data.data_out <= fifo_dma_dout(23 downto 16);
-
-                    when "10" =>
-                        udp_tx_int.data.data_out <= fifo_dma_dout(15 downto 8);
-
-                      -- it takes one clock cycle to get a new word from the fifo
-                      if ( tx_count < tx_count_target-2 and fifo_dma_empty = '0' ) then
-                        set_fifo_dma_read_next <= '1';
-                      end if;
-
-                    when "11" =>
-                        udp_tx_int.data.data_out <= fifo_dma_dout(7 downto 0);
-
-                    when others =>
-                      udp_tx_int.data.data_out <= (others => '0');
-                  end case;
+										case tx_data_count(2 downto 0) is
+										  when "000" =>
+												udp_tx_int.data.data_out <= fifo_dma_dout(39 downto 32);
+										  when "001" =>
+										  		udp_tx_int.data.data_out <= fifo_dma_dout(31 downto 24);	
+										  when "010" =>
+												udp_tx_int.data.data_out <= fifo_dma_dout(23 downto 16);
+										  when "011" =>
+												udp_tx_int.data.data_out <= fifo_dma_dout(15 downto 8);
+											   -- it takes one clock cycle to get a new word from the fifo
+											   if ( tx_count < tx_count_target-2 and fifo_dma_empty = '0' ) then
+												   set_fifo_dma_read_next <= '1';
+											   end if;
+										  when "100" =>
+												udp_tx_int.data.data_out <= fifo_dma_dout(7 downto 0);
+										  when others =>
+											 udp_tx_int.data.data_out <= "00000000";
+										end case;
                 end case;
 
               when do_timeout =>
@@ -1221,7 +1197,7 @@ begin
             -- we have reached the number of data bytes
             -- we wanted to send, lets finish
             if ( tx_count = tx_count_target-1 or
-              ( what_to_do = do_read_dma and fifo_dma_empty = '1' and tx_count(1 downto 0) = "11" ) ) then
+              ( what_to_do = do_read_dma and fifo_dma_empty = '1' and tx_data_count(2 downto 0) = "100" ) ) then
               set_last <= '1';
               set_tx_fin <= SET;
       --        set_tx_started <= CLR;
@@ -1230,11 +1206,11 @@ begin
               test_display_int <= '1';
             else
               set_tx_count <= INCR;
+				  set_tx_data_count <= INCR;
             end if;
 
           end if;
         end if;
-
 
       when FINISH_SEND =>
         case what_to_do is
@@ -1262,19 +1238,16 @@ begin
 					next_state <= PREPARE_NEXT_PKG;
 					set_state <= '1';
 					reset_what_to_do <= '1';
---					debug_signal_0 <= '1';
          	else
 					next_state <= IDLE;
 					set_state <= '1';
 					reset_what_to_do <= '1';
---				   debug_signal_0 <= '0';
 				end if;
 
           when others =>
 		   		next_state <= IDLE;
 			      set_state <= '1';
 			      reset_what_to_do <= '1';
-
         end case;
 
 			when PREPARE_NEXT_PKG =>
@@ -1294,10 +1267,8 @@ begin
 					set_state <= '1';
 					
 					set_dma_reply_additional_information <= INCR;
---					debug_signal_1 <= '0';
 				else 
 					set_nextpkg_count <= INCR;
---					debug_signal_1 <= '1';
 					set_dma_reply_additional_information <= HOLD;
 				end if;
 			
@@ -1309,17 +1280,11 @@ begin
 					keep_register_addr <= '1';
 					next_state <= WAIT_DATA_OUT_RDY;
 					set_state <= '1';
---					debug_signal_2 <= '0';
 				else 
---					debug_signal_2 <= '1';
 					set_nextpkg_count <= INCR;
 				end if;
-
-
     end case;
   end process;
-
-
 
   -- TX response process - SEQ
   tx_proc_sequential: process(tx_mac_aclk)
@@ -1362,17 +1327,16 @@ begin
         end if;
 
         -- count processing
-		 case set_nextpkg_count is
-			when RST =>  		nextpkg_count <= x"00";
-			when INCR => 		nextpkg_count <= nextpkg_count + 1;
-			when HOLD => 		nextpkg_count <= nextpkg_count;
-		 end case;
-		 case set_dma_reply_additional_information is
-			when RST =>  		dma_reply_additional_information <= x"000000";
-			when INCR => 		dma_reply_additional_information <= dma_reply_additional_information + 1;
-			when HOLD => 		dma_reply_additional_information <= dma_reply_additional_information;
-		 end case;
-
+		  case set_nextpkg_count is
+			 when RST =>  		nextpkg_count <= x"00";
+			 when INCR => 		nextpkg_count <= nextpkg_count + 1;
+			 when HOLD => 		nextpkg_count <= nextpkg_count;
+		  end case;
+		  case set_dma_reply_additional_information is
+			 when RST =>  		dma_reply_additional_information <= x"00000000";
+			 when INCR => 		dma_reply_additional_information <= dma_reply_additional_information + 1;
+			 when HOLD => 		dma_reply_additional_information <= dma_reply_additional_information;
+		  end case;
         case set_rx_count is
           when RST =>     rx_count <= x"00";
           when INCR =>    rx_count <= rx_count + 1;
@@ -1397,6 +1361,16 @@ begin
           when RST =>     rx_pkg_ctr_int <= x"00000000";
           when INCR =>    rx_pkg_ctr_int <= rx_pkg_ctr_int + 1;
           when HOLD =>    rx_pkg_ctr_int <= rx_pkg_ctr_int;
+        end case;
+        case set_tx_data_count is
+          when RST =>     tx_data_count <= "000";
+          when INCR =>   
+				if (tx_data_count = "100") then 
+						tx_data_count <= "000";
+				else 
+					tx_data_count <= tx_data_count + 1;
+				end if;
+			 when HOLD =>    tx_data_count <= tx_data_count;
         end case;
 
         -- set tx hdr
@@ -1466,7 +1440,6 @@ begin
 			register_dma_int <= '1';
 		  end if;
 
-		  
         if ( reset_what_to_do = '1' ) then
           what_to_do <= (others => '0');
         end if;
@@ -1480,50 +1453,47 @@ begin
         if ( set_register_addr_zero  = '1' )  then register_addr_int <= x"0000"; end if;
         if ( set_register_write_data1 = '1' ) then register_write_data_int(31 downto 24)  <= udp_rx_int.data.data_in; end if;
         if ( set_register_write_data2 = '1' ) then register_write_data_int(23 downto 16)  <= udp_rx_int.data.data_in; end if;
-        if ( set_register_write_data3 = '1' ) then register_write_data_int(15 downto 8) <= udp_rx_int.data.data_in; end if;
-        if ( set_register_write_data4 = '1' ) then register_write_data_int(7 downto 0)  <= udp_rx_int.data.data_in; end if;
+        if ( set_register_write_data3 = '1' ) then register_write_data_int(15 downto  8) 	<= udp_rx_int.data.data_in; end if;
+        if ( set_register_write_data4 = '1' ) then register_write_data_int( 7 downto  0)  <= udp_rx_int.data.data_in; end if;
         if ( set_register_read_dma_cnt1 = '1' )	then register_dma_count_int(31 downto 24)	<= udp_rx_int.data.data_in; end if;
-		  if ( set_register_read_dma_cnt2 = '1' )	then register_dma_count_int(23 downto 16)		<= udp_rx_int.data.data_in; end if;
-		  if ( set_register_read_dma_cnt3 = '1' )	then register_dma_count_int(15 downto 8)	<= udp_rx_int.data.data_in; end if;
-		  if ( set_register_read_dma_cnt4 = '1' )	then register_dma_count_int(7 downto 0)	<= udp_rx_int.data.data_in; end if;
+		  if ( set_register_read_dma_cnt2 = '1' )	then register_dma_count_int(23 downto 16)	<= udp_rx_int.data.data_in; end if;
+		  if ( set_register_read_dma_cnt3 = '1' )	then register_dma_count_int(15 downto  8)	<= udp_rx_int.data.data_in; end if;
+		  if ( set_register_read_dma_cnt4 = '1' )	then register_dma_count_int( 7 downto  0)	<= udp_rx_int.data.data_in; end if;
         if ( set_register_access = '1' )    then register_access_int <= '1'; end if;
       --  if ( unset_register_access = '1' )    then register_access_int <= '0'; end if;
         --if ( set_register_read_data = '1' )   then register_read_data_int <= REGISTER_READ_DATA; end if;
 		  if ( set_next_register_read_dma_cnt = '1' )	then register_dma_count_int <= how_many_left; end if;
 		  if ( keep_register_addr  = '1' )		then register_addr_int <= remember_addr; end if;
-
-
         if ( set_register_dma_count = '1' ) then
           register_write_data_int(31 downto 0) <= (others => '0');
           --register_write_data_int(1 downto 0) <= "00";
           --register_write_data_int(17 downto 2) <= std_logic_vector( to_unsigned(3,16) );
 			 more_than_one_pkg <= '0';
 
-
-          if ( register_dma_count_int > 367 and REGISTER_DMA_COUNT > 367 ) then -- max: 367 32-bit-words per UDP
-            register_write_data_int(17 downto 2) <= std_logic_vector( to_unsigned(367,16) );
-            tx_count_target <= 368*4;
- 			if(register_dma_count_int > 23121) then 
+          if ( register_dma_count_int > 293 and REGISTER_DMA_COUNT > 293 ) then -- max: 293 40-bit-words per UDP -- max: 367 32-bit-words per UDP
+            register_write_data_int(17 downto 2) <= std_logic_vector( to_unsigned(293,16) );
+            tx_count_target <= 294*5;
+				if(register_dma_count_int > 23121) then 
 					how_many_left <= "00000000000000000101100011100010";
-			else
-				how_many_left <= register_dma_count_int - 367;
-			end if;
+				else
+					how_many_left <= register_dma_count_int - 293;
+				end if;
 				remember_addr <= register_addr_int;
 				more_than_one_pkg <= '1';
         
 			 elsif ( REGISTER_DMA_COUNT = 0 ) then -- or REGISTER_DMA_COUNT = 0 ) then
             register_write_data_int(17 downto 2) <= (others => '0');
-            tx_count_target <= 4;
+            tx_count_target <= 5;
 			 elsif ( register_dma_count_int > REGISTER_DMA_COUNT ) then
             register_write_data_int(10 downto 2) <= REGISTER_DMA_COUNT(8 downto 0);
-            tx_count_target <= to_integer(unsigned(REGISTER_DMA_COUNT + 1)) *4;
+            tx_count_target <= to_integer(unsigned(REGISTER_DMA_COUNT + 1)) *5;
           elsif (register_dma_count_int=0) then
             register_write_data_int(17 downto 2) <= (others => '0');
-            tx_count_target <= 4;	
+            tx_count_target <= 5;	
  
           else
             register_write_data_int(10 downto 2) <= register_dma_count_int(8 downto 0);
-            tx_count_target <= to_integer(unsigned(register_dma_count_int +1)) *4;
+            tx_count_target <= to_integer(unsigned(register_dma_count_int +1)) *5;
           end if;
         end if;
 
@@ -1540,13 +1510,9 @@ begin
         if ( reset_dma_access = '1' ) then
           register_dma_int <= '0';
           register_dma_count_int <= (others => '0');
-
         end if;
-
       end if;
     end if;
-
-
   end process;
 
   -- Make a copy of the register_access_int signal to prevent strange
@@ -1625,7 +1591,6 @@ begin
     -- end if;
   end process;
 
-
   ------------------------------------------------------------------------------
   -- Instantiate the FIFO for buffering the DMA block transfer data
   ------------------------------------------------------------------------------
@@ -1649,7 +1614,7 @@ begin
     fifo_dma_transfer_end, REGISTER_DMA_END, REGISTER_DMA_EMPTY, fifo_dma_full )
   begin
     fifo_dma_reset <= reset_dma_access or glbl_rst;
-    fifo_dma_din <= REGISTER_READ_DATA;
+    fifo_dma_din <= REGISTER_READ_DATA_DMA;
     REGISTER_DMA_WAIT <= fifo_dma_full;-- or finish_get_dma_data;
 
     fifo_dma_write_en <= register_dma_int and REGISTER_READ_READY and not finish_get_dma_data;
@@ -1662,14 +1627,6 @@ begin
 
     finish_get_dma_data <= ( finish_get_dma_data or fifo_dma_transfer_end ) and not (set_what_to_do or set_what_to_do_nextpkg);
 
-
-    -- if ( fifo_dma_transfer_end = '1' ) then
-    --   finish_get_dma_data <= '1';
-    -- elsif ( fifo_dma_reset = '1' ) then
-    --   finish_get_dma_data <= '0';
-    -- -- else
-    -- --   finish_get_dma_data <= finish_get_dma_data;
-    -- end if;
   end process;
 
 end Behavorial;

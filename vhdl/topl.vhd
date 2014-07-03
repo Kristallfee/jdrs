@@ -111,6 +111,7 @@ architecture Behavioral of topl is
   signal register_write_or_read : std_logic; -- 0: read, 1: write
   signal register_addr          : std_logic_vector(15 downto 0);
   signal register_read_data     : std_logic_vector(31 downto 0);
+  signal register_read_data_DMA : std_logic_vector(39 downto 0);
   signal register_write_data    : std_logic_vector(31 downto 0);
   signal register_dma           : std_logic;
   signal register_dma_wait      : std_logic;
@@ -347,6 +348,7 @@ begin
     REGISTER_READ_READY     => register_access_ready,
     REGISTER_WRITE_OR_READ  => register_write_or_read,
     REGISTER_READ_DATA      => register_read_data,
+	 REGISTER_READ_DATA_DMA	 => register_read_data_DMA,
     REGISTER_WRITE_DATA     => register_write_data,
     REGISTER_DMA            => register_dma,
     REGISTER_DMA_WAIT       => register_dma_wait,
@@ -419,6 +421,7 @@ begin
     P_A         => sregs_regaddr,
     P_D         => register_write_data,
     P_D_O       => register_read_data,
+	 P_D_O_DMA   => register_read_data_DMA,
     P_RDY       => register_access_ready,
     P_BLK       => register_dma,
     P_WAIT      => register_dma_wait,

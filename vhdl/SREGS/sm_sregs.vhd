@@ -62,6 +62,7 @@ port (
 	P_A				: in	std_logic_vector(12 downto 2);	-- address
 	P_D				: in	T_SLV32;									-- data - byte count is swapped
 	P_D_O				: out	T_SLV32;									-- data out
+	P_D_O_DMA		: out T_SLV40;									-- data out dma
 	P_RDY				: out	std_logic;								-- data ready
 	P_BLK				: in    std_logic;								-- always read
 	P_WAIT			: in 	std_logic;								--	pause block read
@@ -126,14 +127,29 @@ COMPONENT daq_fifo
   PORT (
     clk 			: 		IN STD_LOGIC;
     srst 		: 		IN STD_LOGIC;
-    din 			: 		IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    din 			: 		IN STD_LOGIC_VECTOR(39 DOWNTO 0);
     wr_en 		: 		IN STD_LOGIC;
     rd_en 		: 		IN STD_LOGIC;
-    dout 		: 		OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dout 		: 		OUT STD_LOGIC_VECTOR(39 DOWNTO 0);
     full 		: 		OUT STD_LOGIC;
     empty 		: 		OUT STD_LOGIC;
     prog_full 	: 		OUT STD_LOGIC;
 	 data_count	: 		out std_logic_vector(17 downto 0)
+  );
+END COMPONENT;
+
+COMPONENT dam_buffer_2
+  PORT (
+    clk : IN STD_LOGIC;
+    srst : IN STD_LOGIC;
+    din : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
+    wr_en : IN STD_LOGIC;
+    rd_en : IN STD_LOGIC;
+    dout : OUT STD_LOGIC_VECTOR(39 DOWNTO 0);
+    full : OUT STD_LOGIC;
+    empty : OUT STD_LOGIC;
+    data_count : OUT STD_LOGIC_VECTOR(17 DOWNTO 0);
+    prog_full : OUT STD_LOGIC
   );
 END COMPONENT;
 
@@ -176,24 +192,26 @@ END COMPONENT;
 
 -- ========================== MMCM_DRP ====================================== --
 	signal rc_do						: T_SLV16;
-	signal rc_we,rc_start				: std_logic;
-	signal drp_busy						: std_logic;
+	signal rc_we,rc_start			: std_logic;
+	signal drp_busy					: std_logic;
 	signal s_rdy						: std_logic;		-- single ready (no block)
-	signal rdy_fi,rdy_fi_d1				: std_logic;
-	signal fi_count,fi_cnt_max			: T_SLV10;
+	signal rdy_fi,rdy_fi_d1			: std_logic;
+	signal fi_count,fi_cnt_max		: T_SLV10;
 	signal fi_wen						: std_logic;
 	signal fi_ren						: std_logic;
-	signal fi_empty,fi_full				: std_logic;
-	signal fi_pfull						: std_logic;		-- 3/4
-	signal fi_datacount					: std_logic_vector(17 downto 0);
-	signal fi_din,fi_dout, fi_din_dummy	: std_logic_vector(31 downto 0);
-	signal fi_valid						: std_logic;
-	signal fill_dma_counter   : std_logic_vector(31 downto 0);
+	signal fi_empty,fi_full			: std_logic;
+	signal fi_pfull					: std_logic;		-- 3/4
+	signal fi_datacount				: std_logic_vector(17 downto 0);
+	signal fi_din_dummy				: std_logic_vector(31 downto 0);
+	signal fi_din,fi_dout         : std_logic_vector(39 downto 0);
+	signal fi_valid					: std_logic;
+	signal fill_dma_counter       : std_logic_vector(39 downto 0);
 	signal blk							: std_logic;
 	signal blk_rdy						: std_logic;
 	signal blk_cnt						: std_logic_vector(17 downto 0);	-- lword count, 1MB
-	signal blk_zero						: std_logic;	-- zero
+	signal blk_zero					: std_logic;	-- zero
 	signal ldt_den						: std_logic;
+   signal ev_datacount_int		   : std_logic_vector(17 downto 0);
 
 -- ======================================================================= --
 --										       Begin                                 --
@@ -273,10 +291,10 @@ with led_config select LED <=
 	one_hertz_counter_i 							when "00000",		-- 0
 	knight_rider_i (7 downto 0)		 		when "00001",		-- 1
 	tpx_fifo_datacount(7 downto 0) 			when "00010",		-- 2
-	fi_datacount(7 downto 0) 					when "00011",		-- 3
-	fi_datacount(15 downto 8)					when "00100",		-- 4
-	fi_datacount(17 downto 16)&"111000"	when "00101",		-- 4	
-	"11111111" 									when others;
+	ev_datacount_int(7 downto 0) 					when "00011",		-- 3
+	ev_datacount_int(15 downto 8)					when "00100",		-- 4
+	ev_datacount_int(17 downto 16)&"011100"		when "00101",		-- 5	
+	"11111111" 										when others;
 
 
 -- ======================================================================= --
@@ -484,7 +502,8 @@ fi_ren	<= not fi_empty and (not fi_valid or blk_rdy or ldt_den or (rdy_fi_d1 and
 
 blk_rdy	<=    blk and not blk_zero and not P_WAIT and fi_valid;
 
-EV_DATACOUNT	<= fi_datacount +('0'&fi_valid);
+ev_datacount_int <= fi_datacount +('0'&fi_valid);
+EV_DATACOUNT <= ev_datacount_int;	
 
 ldt_den	<= DT_ACK and fi_valid;
 
@@ -535,25 +554,25 @@ end process;
 --										sample data fifo											--
 -- ========================================================================== --
 
- fi_din <= tpx_fifodummydata;
- fi_wen <= tpx_fifodummydestwe;
+-- fi_din <= "00000000"&tpx_fifodummydata;
+-- fi_wen <= tpx_fifodummydestwe;
 
 -- fill the DMA constantly with data
 -- (comment the upper two lines out and the process below in)
---fill_dma_with_counter : process( ilclk )
---begin
---	if rising_edge( ilclk ) then
---		if SL2B(ilreset) then
---			fill_dma_counter <= (others => '0');
---		elsif ( fi_full = '1' ) then
---			fill_dma_counter <= fill_dma_counter;
---		else
---			fill_dma_counter <= fill_dma_counter + 1;
---		end if;
---	end if;
---end process;
---fi_din <= fill_dma_counter;
---fi_wen <= not fi_full;
+fill_dma_with_counter : process( ilclk )
+begin
+	if rising_edge( ilclk ) then
+		if SL2B(ilreset) then
+			fill_dma_counter <= (others => '0');
+		elsif ( fi_full = '1' ) then
+			fill_dma_counter <= fill_dma_counter;
+		else
+			fill_dma_counter <= fill_dma_counter - 1;
+		end if;
+	end if;
+end process;
+fi_din <= fill_dma_counter;
+fi_wen <= not fi_full;
 -- fill DMA end
 
 process(ilclk)
@@ -591,6 +610,9 @@ P_RDY	<= s_rdy or blk_rdy or
 						  or B2SL(regadr(regadr'high downto 5) = (SM_DRP/32)))		-- MMCM_DRP
 						  );
 
+P_D_O_DMA <= 	(    SL2SLV(fi_valid and (   blk or DT_ACK	or (s_rdy and not P_WR and B2SL(P_A = SM_RO_DATA)) ),40)  -- P_REG -> s_rdy
+			 and fi_dout);
+
 P_D_O <=
 			(    SL2SLV(P_REG and not P_WR and B2SL(regadr = GLS_IDENT))
 			 and INT2SLV(SC_VERSION))
@@ -599,7 +621,7 @@ P_D_O <=
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = GLS_DOORBELL_MASK))
 			 and EXT2SLV(doorbell_mask))
 		or (	  SL2SLV(P_REG and not P_WR and B2SL(regadr = SM_RO_DATA_COUNT))
-			 and EXT2SLV(fi_datacount))
+			 and EXT2SLV(ev_datacount_int))
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = GLS_TIMER))
 			 and stimer)
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = GLS_DCOUNT))
@@ -614,10 +636,10 @@ P_D_O <=
 			 and EXT2SLV(fi_pfull&fi_valid))
 		or (    SL2SLV(P_REG and not P_WR and B2SL(P_A = SM_BLK_SIZE))
 			 and EXT2SLV(fi_cnt_max))
-		or (    SL2SLV(not fi_valid and s_rdy and not P_WR and B2SL(P_A = SM_RO_DATA))  -- P_REG -> s_rdy
-			 and x"EEEEEEEE")
-		or (    SL2SLV(fi_valid and (   blk or DT_ACK	or (s_rdy and not P_WR and B2SL(P_A = SM_RO_DATA)) ))  -- P_REG -> s_rdy
-			 and fi_dout)
+		-- the data output register must not be accessable via register read, just by dma due to different word width
+		--or (    SL2SLV(not fi_valid and s_rdy and not P_WR and B2SL(P_A = SM_RO_DATA))  -- P_REG -> s_rdy
+		--	 and x"EEEEEEEE")
+
 -- ========================== MMCM_DRP ====================================== --
 		or (    SL2SLV(    P_REG and not P_WR
 						   and B2SL(regadr(regadr'high downto 5) = (SM_DRP/32)))

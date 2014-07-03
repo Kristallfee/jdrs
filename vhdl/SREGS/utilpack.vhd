@@ -35,6 +35,7 @@ package util_pack is
 	subtype T_SLV24	is std_logic_vector(23 downto 0);
 	subtype T_SLV28	is std_logic_vector(27 downto 0);
 	subtype T_SLV32	is std_logic_vector(31 downto 0);
+	subtype T_SLV40	is std_logic_vector(39 downto 0);	
 
 	type T_8DS			is array(7 downto 0) of T_DS;
 	type T_16DS			is array(15 downto 0) of T_DS;

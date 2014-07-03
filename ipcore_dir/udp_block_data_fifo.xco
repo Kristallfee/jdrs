@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.2
-# Date: Thu Jun  5 15:16:32 2014
+# Date: Thu Jun 26 14:08:44 2014
 #
 ##############################################################
 #
@@ -140,7 +140,7 @@ CSET inject_sbit_error_rdch=false
 CSET inject_sbit_error_wach=false
 CSET inject_sbit_error_wdch=false
 CSET inject_sbit_error_wrch=false
-CSET input_data_width=32
+CSET input_data_width=40
 CSET input_depth=1024
 CSET input_depth_axis=1024
 CSET input_depth_rach=16
@@ -149,7 +149,7 @@ CSET input_depth_wach=16
 CSET input_depth_wdch=1024
 CSET input_depth_wrch=16
 CSET interface_type=Native
-CSET output_data_width=32
+CSET output_data_width=40
 CSET output_depth=1024
 CSET overflow_flag=false
 CSET overflow_flag_axi=false
@@ -216,4 +216,4 @@ CSET wuser_width=1
 MISC pkg_timestamp=2011-10-22T06:08:52Z
 # END Extra information
 GENERATE
-# CRC: b4390784
+# CRC: a41f991e
