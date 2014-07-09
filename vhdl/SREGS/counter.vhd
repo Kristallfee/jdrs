@@ -17,6 +17,12 @@
 -- Additional Comments: 
 --
 ----------------------------------------------------------------------------------
+
+-----------------------------------
+-- @file 
+-- @brief Binary counter with the speed of 1 MHz
+
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -31,8 +37,8 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 --use UNISIM.VComponents.all;
 
 entity one_hertz_counter is
-    Port ( CLK : in  STD_LOGIC;
-         COUNTER_OUT : out  std_logic_vector (7 downto 0));
+    Port ( 	CLK 			: in   STD_LOGIC;											--! Clock input (66 MHz)
+				COUNTER_OUT : out  std_logic_vector (7 downto 0));				--! 8 bit counter output 
 			  
 end one_hertz_counter;
 

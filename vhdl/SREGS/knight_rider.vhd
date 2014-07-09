@@ -45,16 +45,16 @@ end knight_rider;
 
 
 architecture Behavioral of knight_rider is
-	constant clk_steps_for_1ms			: integer := 66000;  -- clock steps in one millisecond
+	constant clk_steps_for_1ms			: integer := 66000;  --! clock steps in one millisecond
 	signal clk_steps_propagate			: integer range 0 to 66000000 := clk_steps_for_1ms * 1000;
 	
-	constant led2_on_cycles				: integer := 5;                -- how many cycles should the LED stay bright?
+	constant led2_on_cycles				: integer := 5;                --! how many cycles should the LED stay bright?
 	signal led2_on_cycles_counter		: integer range 0 to led2_on_cycles := 0;
-	signal led2_off_cycles 				: integer range 0 to 30 := 1;  -- how many cycles should the LED stay dark?
+	signal led2_off_cycles 				: integer range 0 to 30 := 1;  --! how many cycles should the LED stay dark?
 	signal led2_off_cycles_counter	: integer range 0 to 30 := 0;
 
-	signal propagate			: STD_LOGIC := '0';  -- propagate the LED to next step if 1
-	signal flip_2led			: STD_LOGIC := '0';  -- trigger to flip the second LED (for afterglow)
+	signal propagate			: STD_LOGIC := '0';  --! propagate the LED to next step if 1
+	signal flip_2led			: STD_LOGIC := '0';  --! trigger to flip the second LED (for afterglow)
 	signal led_status			: STD_LOGIC_VECTOR (7 downto 0) := "00000000";
 	
 	signal led_direction		: bit;  -- 0: left, 1: right
