@@ -27,7 +27,7 @@
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
---    Generated from core with identifier: xilinx.com:ip:fifo_generator:8.1   --
+--    Generated from core with identifier: xilinx.com:ip:fifo_generator:9.2   --
 --                                                                            --
 --    The FIFO Generator is a parameterizable first-in/first-out memory       --
 --    queue generator. Use it to generate resource and performance            --
@@ -43,16 +43,16 @@
 
 -- Interfaces:
 --    AXI4Stream_MASTER_M_AXIS
---    AXI4Stream_MASTER_S_AXIS
+--    AXI4Stream_SLAVE_S_AXIS
 --    AXI4_MASTER_M_AXI
---    AXI4_MASTER_S_AXI
+--    AXI4_SLAVE_S_AXI
 --    AXI4Lite_MASTER_M_AXI
---    AXI4Lite_MASTER_S_AXI
+--    AXI4Lite_SLAVE_S_AXI
 
 -- The following code must appear in the VHDL architecture header:
 
 ------------- Begin Cut here for COMPONENT Declaration ------ COMP_TAG
-COMPONENT dumm_fifo
+COMPONENT sdata_buffer_fifo
   PORT (
     rst : IN STD_LOGIC;
     wr_clk : IN STD_LOGIC;
@@ -63,7 +63,8 @@ COMPONENT dumm_fifo
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    rd_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+    rd_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
+    wr_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------
@@ -72,7 +73,7 @@ END COMPONENT;
 -- body. Substitute your own instance name and net names.
 
 ------------- Begin Cut here for INSTANTIATION Template ----- INST_TAG
-your_instance_name : dumm_fifo
+your_instance_name : sdata_buffer_fifo
   PORT MAP (
     rst => rst,
     wr_clk => wr_clk,
@@ -83,12 +84,13 @@ your_instance_name : dumm_fifo
     dout => dout,
     full => full,
     empty => empty,
-    rd_data_count => rd_data_count
+    rd_data_count => rd_data_count,
+    wr_data_count => wr_data_count
   );
 -- INST_TAG_END ------ End INSTANTIATION Template ------------
 
--- You must compile the wrapper file dumm_fifo.vhd when simulating
--- the core, dumm_fifo. When compiling the wrapper file, be sure to
+-- You must compile the wrapper file sdata_buffer_fifo.vhd when simulating
+-- the core, sdata_buffer_fifo. When compiling the wrapper file, be sure to
 -- reference the XilinxCoreLib VHDL simulation library. For detailed
 -- instructions, please refer to the "CORE Generator Help".
 

@@ -27,7 +27,7 @@
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
---    Generated from core with identifier: xilinx.com:ip:fifo_generator:8.1   --
+--    Generated from core with identifier: xilinx.com:ip:fifo_generator:9.2   --
 --                                                                            --
 --    The FIFO Generator is a parameterizable first-in/first-out memory       --
 --    queue generator. Use it to generate resource and performance            --
@@ -40,19 +40,21 @@
 --    parameterizable, and for native interface FIFOs, asymmetric read and    --
 --    write port widths are also supported.                                   --
 --------------------------------------------------------------------------------
+-- Synthesized Netlist Wrapper
+-- This file is provided to wrap around the synthesized netlist (if appropriate)
 
 -- Interfaces:
---    AXI4Stream_MASTER_M_AXIS
---    AXI4Stream_MASTER_S_AXIS
---    AXI4_MASTER_M_AXI
---    AXI4_MASTER_S_AXI
---    AXI4Lite_MASTER_M_AXI
---    AXI4Lite_MASTER_S_AXI
+--   AXI4Stream_MASTER_M_AXIS
+--   AXI4Stream_SLAVE_S_AXIS
+--   AXI4_MASTER_M_AXI
+--   AXI4_SLAVE_S_AXI
+--   AXI4Lite_MASTER_M_AXI
+--   AXI4Lite_SLAVE_S_AXI
 
--- The following code must appear in the VHDL architecture header:
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 
-------------- Begin Cut here for COMPONENT Declaration ------ COMP_TAG
-COMPONENT dumm_fifo
+ENTITY sdata_buffer_fifo IS
   PORT (
     rst : IN STD_LOGIC;
     wr_clk : IN STD_LOGIC;
@@ -63,32 +65,16 @@ COMPONENT dumm_fifo
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    rd_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+    rd_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
+    wr_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
   );
-END COMPONENT;
--- COMP_TAG_END ------ End COMPONENT Declaration ------------
+END sdata_buffer_fifo;
 
--- The following code must appear in the VHDL architecture
--- body. Substitute your own instance name and net names.
+ARCHITECTURE virtex6 OF sdata_buffer_fifo IS
+BEGIN
 
-------------- Begin Cut here for INSTANTIATION Template ----- INST_TAG
-your_instance_name : dumm_fifo
-  PORT MAP (
-    rst => rst,
-    wr_clk => wr_clk,
-    rd_clk => rd_clk,
-    din => din,
-    wr_en => wr_en,
-    rd_en => rd_en,
-    dout => dout,
-    full => full,
-    empty => empty,
-    rd_data_count => rd_data_count
-  );
--- INST_TAG_END ------ End INSTANTIATION Template ------------
+  -- WARNING: This file provides an entity declaration with empty architecture, it
+  --          does not support direct instantiation. Please use an instantiation
+  --          template (VHO) to instantiate the IP within a design.
 
--- You must compile the wrapper file dumm_fifo.vhd when simulating
--- the core, dumm_fifo. When compiling the wrapper file, be sure to
--- reference the XilinxCoreLib VHDL simulation library. For detailed
--- instructions, please refer to the "CORE Generator Help".
-
+END virtex6;

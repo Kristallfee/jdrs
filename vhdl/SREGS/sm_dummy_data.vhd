@@ -8,7 +8,7 @@
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
--- Description:	SM to save dummy data in a FIFO and transfer it on demand at once to somwhere else.
+-- Description:	SM to save dummy data in a FIFO and transfer it on demand at once to output fifo.
 --						The dummy FIFO can be filled via writing a register. 
 --
 --						The FIFO is a First-Word-Fall-Through Fifo. No readout latency
@@ -19,38 +19,30 @@
 -- Additional Comments: 
 --
 ----------------------------------------------------------------------------------
+
+--! @file
+--! @brief SM to create dummy data 
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity sm_dummy_data is
-    Port ( 	START 	: in  	STD_LOGIC; -- ein start, fuer transfer, gefuellt wird das fifo einfach ueber registerschreiben. 
-				CLK		: in 		std_logic;
-				RESET 	: in 		std_logic;
-				EMPTY		: out 	std_logic;
-				FULL		: out 	std_logic;
-				DATA_COUNT :	out std_logic_vector(9 downto 0);
-				DIN 		: in  	STD_LOGIC_VECTOR (31 downto 0);
-				DWEN		: in 		std_logic;
-				DOUT 		: out  	STD_LOGIC_VECTOR (31 downto 0);
-				DDESTWE	: out 	std_logic;
-				BUSY 		: out  	STD_LOGIC);
+    Port ( 	START_IN 			: IN  	STD_LOGIC; --! START OF DATA TRANSFER FROM DUMMY_FIFO TO OUTPUT FIFO 
+				CLK_WR_IN			: IN 		STD_LOGIC;
+				CLK_RD_IN			: IN 		STD_LOGIC;
+				RESET_IN				: IN 		STD_LOGIC;
+				EMPTY_OUT			: OUT 	STD_LOGIC;
+				FULL_OUT				: OUT 	STD_LOGIC;
+				DATA_COUNT_OUT 	: OUT    STD_LOGIC_VECTOR(9 DOWNTO 0);
+				DATA_IN 				: IN  	STD_LOGIC_VECTOR(31 DOWNTO 0);
+				DATA_WE_IN			: IN 		STD_LOGIC;
+				DATA_OUT 			: OUT  	STD_LOGIC_VECTOR(31 DOWNTO 0);
+				DATA_DEST_WE_OUT	: OUT 	STD_LOGIC;
+				BUSY_OUT 			: OUT  	STD_LOGIC);
 end sm_dummy_data;
 
 architecture Behavioral of sm_dummy_data is
-COMPONENT dumm_fifo
-  PORT (
-    clk 			: 		IN STD_LOGIC;
-    srst 		: 		IN STD_LOGIC;
-    din 			: 		IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    wr_en 		: 		IN STD_LOGIC;
-    rd_en 		: 		IN STD_LOGIC;
-    dout 		: 		OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    full 		: 		OUT STD_LOGIC;
-    empty 		: 		OUT STD_LOGIC;
-    prog_full 	: 		OUT STD_LOGIC;
-	 data_count	:		OUT std_logic_vector(9 downto 0)
-  );
-END COMPONENT;
+
 
 signal fifo_read_enable 					: std_logic;
 signal fifo_empty 							: std_logic;
@@ -67,44 +59,43 @@ begin
 
 -- transfer von dummy daten aus dummy fifo in daten fifo 
 
-EMPTY 			<= fifo_empty;
-FULL				<= fifo_full;
-DDESTWE 			<= fifo_destination_write_enable; -- and not fifo_empty;
-DATA_COUNT 		<= fifo_data_count;
+EMPTY_OUT 			<= fifo_empty;
+FULL_OUT				<= fifo_full;
+DATA_DEST_WE_OUT 	<= fifo_destination_write_enable; -- and not fifo_empty;
+DATA_COUNT_OUT 	<= fifo_data_count;
 	
-dummy_data : dumm_fifo
-	port map(
-		clk			=> CLK,
-		srst			=> RESET,
-		din			=> DIN,
-		wr_en			=> DWEN,
-		rd_en			=> fifo_read_enable,
-		dout			=> DOUT,
-		full			=> fifo_full,
-		empty			=> fifo_empty,
-		prog_full	=> open,
-		data_count	=> fifo_data_count
-	);
+dummy_data : entity work.dumm_fifo
+  PORT MAP (
+    rst 				=> RESET_IN,
+    wr_clk 			=> CLK_WR_IN,
+    rd_clk 			=> CLK_RD_IN,
+    din 				=> DATA_IN,
+    wr_en 			=> DATA_WE_IN,
+    rd_en 			=> fifo_read_enable,
+    dout 			=> DATA_OUT,
+    full 			=> fifo_full,
+    empty 			=> fifo_empty,
+    rd_data_count => fifo_data_count
+  );	
 	
-	
-		DUMMY: process(CLK)
+DUMMY: process(CLK_RD_IN)
 	begin
-		if rising_edge(CLK) then
-			if RESET = '1' then
+		if rising_edge(CLK_RD_IN) then
+			if RESET_IN = '1' then
 				state         <= idle;
-				BUSY          <= '0';
+				BUSY_OUT          <= '0';
 				fifo_read_enable <=  '0';
 
 			else  case state is
 
 				when idle =>
-					if START = '1' then
+					if START_IN = '1' then
 						state <= transfer;
 						fifo_read_enable <= '1';
 						fifo_destination_write_enable <= '0';
-						BUSY <= '1';
+						BUSY_OUT <= '1';
 					else 
-						BUSY <='0';
+						BUSY_OUT <='0';
 						fifo_read_enable <= '0';
 						fifo_destination_write_enable <= '0';
 						state <= state;
@@ -114,12 +105,12 @@ dummy_data : dumm_fifo
 						state <= transfer; 
 						fifo_read_enable <= '1';
 						fifo_destination_write_enable <= '1';
-						BUSY <= '1';
+						BUSY_OUT <= '1';
 					else 
 						state <= idle;
 						fifo_read_enable <= '0';
 						fifo_destination_write_enable <= '0';
-						BUSY <= '0';
+						BUSY_OUT <= '0';
 					end if;
 				end case;
 			end if;

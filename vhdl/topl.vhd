@@ -76,6 +76,125 @@ entity topl is
     GMII_CRS            : in  std_logic;
     MII_TX_CLK          : in  std_logic;
 
+-- -------------------------- ToPix Signals ------------------------------ --
+	FMC_LPC_CLK1_M2C_P	: in   std_logic;  -- tsensor_clk  !!!ToDo signalrichtung ueberpruefen
+--	FMC_LPC_CLK1_M2C_N	: in   std_logic;	 -- 
+
+	FMC_LPC_CLK0_M2C_P   : in   std_logic;  -- tsensor_sio  !!!ToDo signalrichtung ueberpruefen
+-- FMC_LPC_CLK0_M2C_N   : in   std_logic;  -- 		
+
+	FMC_LPC_LA00_CC_P		: out  std_logic;  -- clk_ext+
+	FMC_LPC_LA00_CC_N		: out  std_logic;	 -- clk_ext-
+
+--	FMC_LPC_LA01_CC_P		: out  std_logic;
+--	FMC_LPC_LA01_CC_N		: out  std_logic;
+	
+	FMC_LPC_LA02_P			: out  std_logic;	 -- tsensor_cs
+--	FMC_LPC_LA02_N			: out  std_logic;	 -- 
+
+	FMC_LPC_LA03_P			: out  std_logic;	 -- testp_h
+	FMC_LPC_LA03_N			: out  std_logic;	 -- testp_l
+
+	FMC_LPC_LA04_P			: in  std_logic;  -- eoc+
+	FMC_LPC_LA04_N			: in  std_logic;  -- eoc-
+
+--	FMC_LPC_LA05_P			: in  std_logic;  -- 
+--	FMC_LPC_LA05_N			: in  std_logic;  -- 
+	
+--	FMC_LPC_LA06_P			: in  std_logic;  -- 
+--	FMC_LPC_LA06_N			: in  std_logic;  -- 
+
+	FMC_LPC_LA07_P			: in  std_logic;  -- seu_fsm+
+	FMC_LPC_LA07_N			: in  std_logic;  -- seu_fsm-
+
+	FMC_LPC_LA08_P			: in   std_logic;  -- seu_reg+
+	FMC_LPC_LA08_N			: in   std_logic;	 -- seu_reg-
+
+	FMC_LPC_LA11_P			: out   std_logic;  -- data_wait+
+	FMC_LPC_LA11_N			: out   std_logic;  -- data_wait-
+
+	FMC_LPC_LA12_P			: in   std_logic;	 -- busy+
+	FMC_LPC_LA12_N			: in   std_logic;  -- busy-
+
+	FMC_LPC_LA15_P			: in   std_logic;  -- ddr_out+
+	FMC_LPC_LA15_N			: in   std_logic;  -- ddr_out-
+
+	FMC_LPC_LA16_P			: in  std_logic;  -- data_valid+
+	FMC_LPC_LA16_N			: in  std_logic;  -- data_valid-
+
+	FMC_LPC_LA19_P			: in  std_logic;  -- serial_out+
+	FMC_LPC_LA19_N			: in  std_logic;  -- serial_out-
+
+	FMC_LPC_LA20_P			: in  std_logic;  -- sdr_out+
+	FMC_LPC_LA20_N			: in  std_logic;  -- sdr_out-
+
+	FMC_LPC_LA21_P			: out  std_logic;  -- serial_in+
+	FMC_LPC_LA21_N			: out  std_logic;  -- serial_in-
+
+	FMC_LPC_LA22_P			: out  std_logic;  -- serial_en+
+	FMC_LPC_LA22_N			: out  std_logic;  -- serial_en-
+	
+	FMC_LPC_LA24_P			: out  std_logic;  -- cnt_rst+
+	FMC_LPC_LA24_N			: out  std_logic;  -- cnt_rst-
+
+	FMC_LPC_LA25_P			: out  std_logic;  -- clock+
+	FMC_LPC_LA25_N			: out  std_logic;  -- clock-
+
+	FMC_LPC_LA28_P			: out  std_logic;  -- dac_sdi
+--	FMC_LPC_LA28_N			: out  std_logic;  -- 
+
+	FMC_LPC_LA29_P			: out  std_logic;  -- reset+
+	FMC_LPC_LA29_N			: out  std_logic;  -- reset-
+
+	FMC_LPC_LA30_P			: out  std_logic;  -- dac_sck
+--	FMC_LPC_LA30_N			: out  std_logic;  -- 
+
+	FMC_LPC_LA31_P			: out  std_logic;  -- dac_clr
+--	FMC_LPC_LA31_N			: out  std_logic;  -- 
+
+	FMC_LPC_LA32_P			: out  std_logic;  -- rst_ext+  !!!ToDo signalrichtung ueberpruefen
+	FMC_LPC_LA32_N			: out  std_logic;  -- rst_ext-  !!!ToDo signalrichtung ueberpruefen
+
+	FMC_LPC_LA33_P			: out  std_logic;  -- dac_cs_ld
+--	FMC_LPC_LA33_N			: out  std_logic;  -- 
+
+--	FMC_LPC_CLK0_M2C_P	: out  std_logic;  -- 
+--	FMC_LPC_CLK0_M2C_N	: out  std_logic;  -- 
+
+--	FMC_HPC_LA02_N			: out  std_logic;	 -- Debug Signale on HPC
+--	FMC_HPC_LA02_P			: out  std_logic;
+--
+--	FMC_HPC_LA04_N			: out  std_logic;
+--	FMC_HPC_LA04_P			: out  std_logic;
+--
+--	FMC_HPC_LA07_N			: out  std_logic;
+--	FMC_HPC_LA07_P			: out  std_logic;
+--
+--	FMC_HPC_LA05_N			: out  std_logic;
+--	FMC_HPC_LA05_P			: out  std_logic;
+--
+--	FMC_HPC_LA06_N			: out  std_logic;
+--	FMC_HPC_LA06_P			: out  std_logic;
+--
+--	FMC_HPC_LA11_N			: out  std_logic;
+--	FMC_HPC_LA11_P			: out  std_logic;
+--
+--	FMC_HPC_LA15_N			: out  std_logic;
+--	FMC_HPC_LA15_P			: out  std_logic;
+--
+--	FMC_HPC_LA19_N			: out  std_logic;
+--	FMC_HPC_LA19_P			: out  std_logic;
+--
+--	FMC_HPC_LA03_N			: out std_logic;
+--	FMC_HPC_LA03_P			: out std_logic;
+--
+--	FMC_HPC_LA28_N			: out std_logic;
+--	FMC_HPC_LA28_P			: out std_logic;
+--
+--	FMC_HPC_LA00_CC_N		: out std_logic;
+--	FMC_HPC_LA00_CC_P		: out std_logic;
+
+
     -- Serialised statistics vectors
     --------------------------------
   --  TX_STATISTICS_S     : out std_logic;
@@ -91,9 +210,6 @@ entity topl is
     USER_SWITCH         : in  std_logic_vector (4 downto 0)		--! 8 GPIO Switches
   );
 end topl;
-
-
-
 
 architecture Behavioral of topl is
 
@@ -155,19 +271,184 @@ architecture Behavioral of topl is
 --  signal sregs_buffer_address         : std_logic_vector(7 downto 0);
 --  signal sregs_buffer_write_data        : std_logic_vector(31 downto 0);
 
-  -- SREGS signals
-  signal sregs_clk            : std_logic;
-  signal sys_mode             : std_logic_vector(15 downto 0);
-  signal sregs_regaddr        : std_logic_vector(12 downto 2);
-  alias regadr                : std_logic_vector(8 downto 0) is sregs_regaddr(10 downto 2);
+   -- SREGS signals
+   signal sregs_clk            : std_logic;
+ --  signal sys_mode             : std_logic_vector(15 downto 0);
+   signal sregs_regaddr        : std_logic_vector(12 downto 2);
+   alias regadr                : std_logic_vector(8 downto 0) is sregs_regaddr(10 downto 2);
 
-  signal test_display_int     : std_logic;
-  signal test_display_output  : std_logic;
+   signal test_display_int     : std_logic;
+   signal test_display_output  : std_logic;
 
-
+	signal DAC_SDI					: std_logic;
+	signal DAC_SCK					: std_logic;
+	signal DAC_CLR					: std_logic;
+	signal DAC_CS_LD				: std_logic;
+	
+	signal clk200					: std_logic;
+	signal topix_testp			: std_logic;
+	signal topix_eoc				: std_logic;
+	signal topix_data_wait		: std_logic;
+	signal topix_busy				: std_logic;
+	signal topix_seu_reg			: std_logic;
+	signal topix_seu_fsm			: std_logic;
+	signal topix_serial_in		: std_logic;
+	signal topix_serial_out 	: std_logic;
+	signal topix_serial_en   	: std_logic;	
+	signal topix_cnt_rst			: std_logic;
+	signal topix_data_valid		: std_logic;
+	signal topix_reset			: std_logic;
+	signal topix_sdr_out	 		: std_logic;
+	signal topix_clock	 		: std_logic;	
+	signal topix_ddr_out			: std_logic;
+	signal lreset					: std_logic;	
+	signal topix_reset		: std_logic;
 
 begin
 
+	FMC_LPC_LA02_P <= '0';
+
+  ------------------------------------------------------------------------------
+  -- ToPix Differential buffers
+  ------------------------------------------------------------------------------
+	
+	OBUFDS_ext_clock :  OBUFDS
+	port map(
+	I => '0',
+	O => FMC_LPC_LA00_CC_P,
+	OB => FMC_LPC_LA00_CC_N
+	);
+	
+	
+	topix_testp <= '0';
+	
+	OBUFDS_testp :  OBUFDS
+	port map(
+	I =>  topix_testp,
+	O => FMC_LPC_LA03_P,
+	OB => FMC_LPC_LA03_N
+	);
+	
+	IBUFDS_eoc : IBUFDS
+	port map(
+	O => topix_eoc,
+	I => FMC_LPC_LA04_P,
+	IB => FMC_LPC_LA04_N
+	);
+
+	IBUFDS_seu_fsm : IBUFDS
+	port map(
+	O => topix_seu_fsm,
+	I => FMC_LPC_LA07_P,
+	IB => FMC_LPC_LA07_N
+	);
+
+	IBUFDS_seu_reg : IBUFDS
+	port map(
+	O => topix_seu_reg,
+	I => FMC_LPC_LA08_P,
+	IB => FMC_LPC_LA08_N
+	);
+	
+	OBUFDS_data_wait :  OBUFDS
+	port map(
+	I =>  topix_data_wait,
+	O => FMC_LPC_LA11_P,
+	OB => FMC_LPC_LA11_N
+	);
+	
+	IBUFDS_busy : IBUFDS
+	port map(
+	O => topix_busy,
+	I => FMC_LPC_LA12_P,
+	IB => FMC_LPC_LA12_N
+	);
+	
+	IBUFDS_ddr_out : IBUFDS
+	port map(
+	O => topix_ddr_out,
+	I => FMC_LPC_LA15_P,
+	IB => FMC_LPC_LA15_N
+	);
+	
+	topix_data_valid <= '0';
+	
+	IBUFDS_data_vaild : IBUFDS
+	port map(
+	O => open,
+	I => FMC_LPC_LA16_P,
+	IB => FMC_LPC_LA16_N
+	);
+
+	IBUFDS_serial_out : IBUFDS
+	port map(
+	O => topix_serial_out,
+	I => FMC_LPC_LA19_P,
+	IB => FMC_LPC_LA19_N
+	);
+
+	IBUFDS_sdr_out : IBUFDS
+	port map(
+	O => topix_sdr_out,
+	I => FMC_LPC_LA20_P,
+	IB => FMC_LPC_LA20_N
+	);
+
+	OBUFDS_serial_in :  OBUFDS
+	port map(
+	I => topix_serial_in,
+	O => FMC_LPC_LA21_P,
+	OB => FMC_LPC_LA21_N
+	);
+
+	OBUFDS_serial_en :  OBUFDS
+	port map(
+	I => topix_serial_en,
+	O => FMC_LPC_LA22_P,
+	OB => FMC_LPC_LA22_N
+	);
+	
+	topix_cnt_rst <= '0';
+	
+	OBUFDS_cnt_rst :  OBUFDS
+	port map(
+	I => topix_cnt_rst,
+	O => FMC_LPC_LA24_P,
+	OB => FMC_LPC_LA24_N
+	);
+	
+	OBUFDS_clock :  OBUFDS
+	port map(
+	I => topix_clock,
+	O => FMC_LPC_LA25_P,
+	OB => FMC_LPC_LA25_N
+	);
+	
+	topix_reset <= lreset or topix_reset;
+	
+	OBUFDS_reset :  OBUFDS
+	port map(
+	I => topix_reset,
+	O => FMC_LPC_LA29_P,
+	OB => FMC_LPC_LA29_N
+	);
+	
+		OBUFDS_ext_reset :  OBUFDS
+	port map(
+	I => '0',
+	O => FMC_LPC_LA32_P,
+	OB => FMC_LPC_LA32_N
+	);
+
+  ------------------------------------------------------------------------------
+  -- ToPix DAC
+  ------------------------------------------------------------------------------
+	
+	FMC_LPC_LA28_P <= DAC_SDI;
+   FMC_LPC_LA31_P <= not (lreset or DAC_CLR);
+   FMC_LPC_LA30_P <= DAC_SCK;
+	FMC_LPC_LA33_P <= DAC_CS_LD;
+	
   ------------------------------------------------------------------------------
   -- Clock generator
   ------------------------------------------------------------------------------
@@ -366,25 +647,25 @@ begin
   -- SREGS register control
   ------------------------------------------------------------------------------
 
-  PULSE_EVERY_1MS : entity work.pulse_every
-  generic map (
-    CLOCK_CYCLES_PER_PULSE  => 50000
-  )
-  port map (
-    CLK   => clk_50,
-    RST   => GLBL_RST,
-    PULSE => pulse_1ms
-  );
-
-  PULSE_EVERY_100MS : entity work.pulse_every
-  generic map (
-    CLOCK_CYCLES_PER_PULSE  => 100
-  )
-  port map (
-    CLK   => pulse_1ms,
-    RST   => GLBL_RST,
-    PULSE => pulse_100ms
-  );
+--  PULSE_EVERY_1MS : entity work.pulse_every
+--  generic map (
+--    CLOCK_CYCLES_PER_PULSE  => 50000
+--  )
+--  port map (
+--    CLK   => clk_50,
+--    RST   => GLBL_RST,
+--    PULSE => pulse_1ms
+--  );
+--
+--  PULSE_EVERY_100MS : entity work.pulse_every
+--  generic map (
+--    CLOCK_CYCLES_PER_PULSE  => 100
+--  )
+--  port map (
+--    CLK   => pulse_1ms,
+--    RST   => GLBL_RST,
+--    PULSE => pulse_100ms
+--  );
 
   -- dma_register_read : process ( CLK66 )
   -- begin
@@ -411,42 +692,59 @@ begin
     BASECLOCK   => gtx_clk_bufg,--CLK66,
     CLK66       => CLK66, -- a direct clock connection is needed for the MMCM
     GRESET      => open,  -- a reset from the SREGS
-    P1MS        => pulse_1ms,
+   -- P1MS        => pulse_1ms,
     LED         => USER_LED,
     USER_SWITCH => USER_SWITCH,
 
+  -- ----------------------- DAC ----------------------------------------- --  
+	DAC_SDI   =>   DAC_SDI,
+	DAC_CLR   =>   DAC_CLR,
+	DAC_SCK   =>   DAC_SCK,
+	DAC_CS_LD =>   DAC_CS_LD,
   -- -------------------------- local bus to communication port ------------- --
-    P_REG       => register_access,
-    P_WR        => register_write_or_read,
-    P_A         => sregs_regaddr,
-    P_D         => register_write_data,
-    P_D_O       => register_read_data,
-	 P_D_O_DMA   => register_read_data_DMA,
-    P_RDY       => register_access_ready,
-    P_BLK       => register_dma,
-    P_WAIT      => register_dma_wait,
-    P_END       => register_dma_end,
-    DMD_DMA     => sys_mode(0),
+    P_REG       	=> register_access,
+    P_WR        	=> register_write_or_read,
+    P_A        	=> sregs_regaddr,
+    P_D         	=> register_write_data,
+    P_D_O       	=> register_read_data,
+	 P_D_O_DMA   	=> register_read_data_DMA,
+    P_RDY       	=> register_access_ready,
+    P_BLK       	=> register_dma,
+    P_WAIT     	=> register_dma_wait,
+    P_END       	=> register_dma_end,
+
+  -- ----------------------- ToPix ----------------------------------------- --
+	TOPIX_DATA_WAIT	=>		topix_data_wait,
+	TOPIX_DATA_VALID	=>		topix_data_valid,
+	TOPIX_SDR_OUT		=>		topix_sdr_out,
+	TOPIX_RESET_OUT	=> 	topix_reset,
+
+	 TPX_SDATA_IN	=> topix_serial_in,
+	 TPX_SDATA_EN	=> topix_serial_en,
+	 TPX_SDATA_OUT	=> topix_serial_out,
+	 TPX_CLOCK		=> topix_clock,
+	 
+    --DMD_DMA     	=> sys_mode(0),
     EV_DATACOUNT  => register_dma_count, --ev_datacount,
 
   -- -------------------------- direct block transfer ----------------------- --
-    DT_REQ      => open, --p_dt_req,
-    DT_ACK      => '0', --register_dt_ack, --p_dt_ack,
-    DT_DEN      => open, --p_dt_den,
-    FIFO_EMPTY  => register_dma_empty, --fifo_empty_i,
+--    DT_REQ      	=> open, --p_dt_req,
+ --   DT_ACK      	=> '0', --register_dt_ack, --p_dt_ack,
+--    DT_DEN      	=> open, --p_dt_den,
+    FIFO_EMPTY  	=> register_dma_empty --fifo_empty_i,
 
   -- -------------------------- write to Host register request -------------- --
-    HREG_REQ    => open, --hreg_req,
-    HREG_A      => open, --hreg_a,
-    HREG_D      => open, --hreg_d,
-    HREG_ACK    => '0', --hreg_ack,
+ --   HREG_REQ    	=> open, --hreg_req,
+ --   HREG_A      	=> open, --hreg_a,
+ --   HREG_D      	=> open, --hreg_d,
+  --  HREG_ACK    	=> '0', --hreg_ack,
 
   -- -------------------------- control/status ------------------------------ --
-    SYS_MODE    => sys_mode,
+   -- SYS_MODE    	=> sys_mode,
 
   -- -------------------------- host doorbell ------------------------------- --
-    P100MS      => pulse_100ms,
-    DMD_WR      => '0' --p_dt_den
+   -- P100MS      	=> pulse_100ms,
+  --  DMD_WR      	=> '0' --p_dt_den
   );
 
   test_display_int <= (register_access and register_write_or_read) and

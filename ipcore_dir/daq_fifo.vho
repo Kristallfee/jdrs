@@ -54,15 +54,16 @@
 ------------- Begin Cut here for COMPONENT Declaration ------ COMP_TAG
 COMPONENT daq_fifo
   PORT (
-    clk : IN STD_LOGIC;
-    srst : IN STD_LOGIC;
+    rst : IN STD_LOGIC;
+    wr_clk : IN STD_LOGIC;
+    rd_clk : IN STD_LOGIC;
     din : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
     wr_en : IN STD_LOGIC;
     rd_en : IN STD_LOGIC;
     dout : OUT STD_LOGIC_VECTOR(39 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(17 DOWNTO 0);
+    rd_data_count : OUT STD_LOGIC_VECTOR(17 DOWNTO 0);
     prog_full : OUT STD_LOGIC
   );
 END COMPONENT;
@@ -74,15 +75,16 @@ END COMPONENT;
 ------------- Begin Cut here for INSTANTIATION Template ----- INST_TAG
 your_instance_name : daq_fifo
   PORT MAP (
-    clk => clk,
-    srst => srst,
+    rst => rst,
+    wr_clk => wr_clk,
+    rd_clk => rd_clk,
     din => din,
     wr_en => wr_en,
     rd_en => rd_en,
     dout => dout,
     full => full,
     empty => empty,
-    data_count => data_count,
+    rd_data_count => rd_data_count,
     prog_full => prog_full
   );
 -- INST_TAG_END ------ End INSTANTIATION Template ------------

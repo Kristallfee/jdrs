@@ -92,12 +92,13 @@ package sample_package is
 	constant RB_BUSY_REG 			: integer	:=16#104#; -- hex address 410 
 	constant RB_DCMDATA_REG			: integer	:=16#105#;	--hex address 414
 	
---	constant TPX_FIFODUMMY_REG  	: T_MGLREG	:="10101";	--hex address 854 (adresse wurde geaendert, zurueckaendern! )
-	constant TPX_FIFODUMMY_REG  	: integer	:=16#108#;  --hex address 420
+--	constant TPX_FIFODUMMY_REG		: T_MGLREG	:="10101";	--hex address 854 (adresse wurde geaendert, zurueckaendern! )
+	constant TPX_FIFODUMMY_REG		: integer	:=16#108#;  --hex address 420
+	constant TPX_SDATA_OUTPUT_REG	: integer 	:=16#109#;  --hex address 424
 	constant TPX_LEDINFOREG			: integer	:=16#107#;  --hex address 41c
-	constant TPX_SLOW_CTRL		 	: integer	:=16#120#;  --hex address 480
-	constant TPX_INPUT_REG		 	: integer	:=16#121#;	--hex address 484
-	constant TPX_INPUTCOUNT_REG 	: integer  	:=16#122#;	--hex address 488
+	constant TPX_SLOW_CTRL			: integer	:=16#120#;  --hex address 480
+	constant TPX_SDATA_INPUT_REG	: integer	:=16#121#;	--hex address 484
+	constant TPX_INPUTCOUNT_REG	: integer  	:=16#122#;	--hex address 488
 	constant TPX_TRIGCOUNT_REG		: integer	:=16#124#;  --hex address 490
 
 	constant LTCREG_SEL			 	: integer 	:=16#125#;	--hex address 494
@@ -119,6 +120,8 @@ package sample_package is
 	
 	constant LCD_MODE_REG			: integer 	:=16#133#; 	--hex address 4CC 
 	constant LCD_FIFO_CHAR_REG		: integer 	:=16#134#; 	--hex address 4D0 
+	constant CHOOSE_DATA_PATH		: integer	:=16#135#;	--hex address 4D4
+	constant FAKE_DATA_INTERVAL	: integer 	:=16#136#;	--hex address 4D8
 --	constant LCD_CHAR_REG_1_1		: integer 	:=16#134#; 	--hex address 4D0 
 --	constant LCD_CHAR_REG_1_2		: integer 	:=16#135#; 	--hex address 4D4
 --	constant LCD_CHAR_REG_1_3		: integer 	:=16#136#; 	--hex address 4D8
@@ -128,15 +131,21 @@ package sample_package is
 --	constant LCD_CHAR_REG_2_3		: integer 	:=16#13a#; 	--hex address 4E8
 --	constant LCD_CHAR_REG_2_4		: integer 	:=16#13b#; 	--hex address 4EC      
 	
---	constant SM_IDENT				: integer :=16#101#;  	-- 404   raus, doppelt zu GLS_IDENT
+--	constant SM_IDENT				: integer :=16#101#;  	-- 404   raus, doppelt zu GLS_IDEN
+	
 	
 	constant SCR_ENA				: integer := 0;
 	constant SCR_HIGH				: integer := 15;
 
 	constant SM_SR					: integer :=16#109#;    --
 	constant SM_BLK_SIZE			: integer :=16#106#;    -- 418    DMA FIFO data count
-	constant SM_RO_DATA				: integer :=16#100#;    -- 400    Register address for DMA transfer
+	constant SM_RO_DATA			: integer :=16#100#;    -- 400    Register address for DMA transfer
 	constant SM_RO_DATA_COUNT	: integer :=16#10a#;
+
+-- -------------------------- ToPix 4 Registers --------------- --
+
+
+
 -- -------------------------- Giga Link protocol constants --------------- --
 
 	constant GL_START	: T_SLV8 := x"1C";	-- K.28.0  

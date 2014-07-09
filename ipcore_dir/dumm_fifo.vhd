@@ -22,7 +22,7 @@
 --    devices, or systems.  Use in such applications are expressly            --
 --    prohibited.                                                             --
 --                                                                            --
---    (c) Copyright 1995-2012 Xilinx, Inc.                                    --
+--    (c) Copyright 1995-2014 Xilinx, Inc.                                    --
 --    All rights reserved.                                                    --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -42,16 +42,16 @@ LIBRARY XilinxCoreLib;
 -- synthesis translate_on
 ENTITY dumm_fifo IS
   PORT (
-    clk : IN STD_LOGIC;
-    srst : IN STD_LOGIC;
+    rst : IN STD_LOGIC;
+    wr_clk : IN STD_LOGIC;
+    rd_clk : IN STD_LOGIC;
     din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     wr_en : IN STD_LOGIC;
     rd_en : IN STD_LOGIC;
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
-    prog_full : OUT STD_LOGIC
+    rd_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
   );
 END dumm_fifo;
 
@@ -59,16 +59,16 @@ ARCHITECTURE dumm_fifo_a OF dumm_fifo IS
 -- synthesis translate_off
 COMPONENT wrapped_dumm_fifo
   PORT (
-    clk : IN STD_LOGIC;
-    srst : IN STD_LOGIC;
+    rst : IN STD_LOGIC;
+    wr_clk : IN STD_LOGIC;
+    rd_clk : IN STD_LOGIC;
     din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     wr_en : IN STD_LOGIC;
     rd_en : IN STD_LOGIC;
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
-    prog_full : OUT STD_LOGIC
+    rd_data_count : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
   );
 END COMPONENT;
 
@@ -98,7 +98,7 @@ END COMPONENT;
       c_axis_tstrb_width => 4,
       c_axis_tuser_width => 4,
       c_axis_type => 0,
-      c_common_clock => 1,
+      c_common_clock => 0,
       c_count_type => 0,
       c_data_count_width => 10,
       c_default_value => "BlankString",
@@ -121,7 +121,7 @@ END COMPONENT;
       c_error_injection_type_wdch => 0,
       c_error_injection_type_wrch => 0,
       c_family => "virtex6",
-      c_full_flags_rst_val => 0,
+      c_full_flags_rst_val => 1,
       c_has_almost_empty => 0,
       c_has_almost_full => 0,
       c_has_axi_aruser => 0,
@@ -140,7 +140,7 @@ END COMPONENT;
       c_has_axis_tstrb => 0,
       c_has_axis_tuser => 0,
       c_has_backup => 0,
-      c_has_data_count => 1,
+      c_has_data_count => 0,
       c_has_data_counts_axis => 0,
       c_has_data_counts_rach => 0,
       c_has_data_counts_rdch => 0,
@@ -157,17 +157,17 @@ END COMPONENT;
       c_has_prog_flags_wach => 0,
       c_has_prog_flags_wdch => 0,
       c_has_prog_flags_wrch => 0,
-      c_has_rd_data_count => 0,
+      c_has_rd_data_count => 1,
       c_has_rd_rst => 0,
-      c_has_rst => 0,
+      c_has_rst => 1,
       c_has_slave_ce => 0,
-      c_has_srst => 1,
+      c_has_srst => 0,
       c_has_underflow => 0,
       c_has_valid => 0,
       c_has_wr_ack => 0,
       c_has_wr_data_count => 0,
       c_has_wr_rst => 0,
-      c_implementation_type => 0,
+      c_implementation_type => 2,
       c_implementation_type_axis => 1,
       c_implementation_type_rach => 2,
       c_implementation_type_rdch => 1,
@@ -199,15 +199,15 @@ END COMPONENT;
       c_prog_empty_type_wach => 5,
       c_prog_empty_type_wdch => 5,
       c_prog_empty_type_wrch => 5,
-      c_prog_full_thresh_assert_val => 1022,
+      c_prog_full_thresh_assert_val => 1021,
       c_prog_full_thresh_assert_val_axis => 1023,
       c_prog_full_thresh_assert_val_rach => 1023,
       c_prog_full_thresh_assert_val_rdch => 1023,
       c_prog_full_thresh_assert_val_wach => 1023,
       c_prog_full_thresh_assert_val_wdch => 1023,
       c_prog_full_thresh_assert_val_wrch => 1023,
-      c_prog_full_thresh_negate_val => 1021,
-      c_prog_full_type => 1,
+      c_prog_full_thresh_negate_val => 1020,
+      c_prog_full_type => 0,
       c_prog_full_type_axis => 5,
       c_prog_full_type_rach => 5,
       c_prog_full_type_rdch => 5,
@@ -269,16 +269,16 @@ BEGIN
 -- synthesis translate_off
 U0 : wrapped_dumm_fifo
   PORT MAP (
-    clk => clk,
-    srst => srst,
+    rst => rst,
+    wr_clk => wr_clk,
+    rd_clk => rd_clk,
     din => din,
     wr_en => wr_en,
     rd_en => rd_en,
     dout => dout,
     full => full,
     empty => empty,
-    data_count => data_count,
-    prog_full => prog_full
+    rd_data_count => rd_data_count
   );
 -- synthesis translate_on
 

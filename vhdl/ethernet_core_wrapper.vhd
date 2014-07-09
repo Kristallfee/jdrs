@@ -55,8 +55,8 @@ entity ethernet_core_wrapper is
     GLBL_RST          : in  std_logic;
 
     -- input clocks from generator
-    REFCLK_BUFG       : in  std_logic;  -- 200 MHz main clock
-    GTX_CLK_BUFG      : in  std_logic;  -- 125 MHz GTX clock
+    REFCLK_BUFG       : in  std_logic;  --! 200 MHz main clock
+    GTX_CLK_BUFG      : in  std_logic;  --! 125 MHz GTX clock
     DCM_LOCKED        : in  std_logic;
 
     PHY_RESETN        : out std_logic;
@@ -368,18 +368,18 @@ architecture Behavorial of ethernet_core_wrapper is
   -- what_to_do is the first byte of the UDP data payload and is
   --  an identifyer, that tells us what should be done.
   subtype what_to_do_type is std_logic_vector(7 downto 0);
-  constant do_nothing         : what_to_do_type := x"00";  -- nothing is happening here, just keep going
-  constant do_ping            : what_to_do_type := x"01";  -- request a pong reply
-  constant do_pong            : what_to_do_type := x"02";  -- answer to a ping request
-  constant do_confirm         : what_to_do_type := x"03";  -- confirmation
-  constant do_error           : what_to_do_type := x"04";  -- something went wrong
-  constant do_timeout         : what_to_do_type := x"05";  -- a timeout for a request occured
-  constant do_read_register   : what_to_do_type := x"11";  -- read out a register value
-  constant do_write_register  : what_to_do_type := x"12";  -- set a register value
-  constant do_pkg_count_read  : what_to_do_type := x"13";  -- read out the package counter
-  constant do_pkg_count_reset : what_to_do_type := x"14";  -- reset the package counter
-  constant do_read_dma        : what_to_do_type := x"21";  -- read from the DMA fifo
-  constant do_read_available_data : what_to_do_type := x"24";  -- read available data
+  constant do_nothing         : what_to_do_type := x"00";  		--! nothing is happening here, just keep going
+  constant do_ping            : what_to_do_type := x"01";  		--! request a pong reply
+  constant do_pong            : what_to_do_type := x"02";  		--! answer to a ping request
+  constant do_confirm         : what_to_do_type := x"03";  		--! confirmation
+  constant do_error           : what_to_do_type := x"04";  		--! something went wrong
+  constant do_timeout         : what_to_do_type := x"05";  		--! a timeout for a request occured
+  constant do_read_register   : what_to_do_type := x"11";  		--! read out a register value
+  constant do_write_register  : what_to_do_type := x"12";  		--! set a register value
+  constant do_pkg_count_read  : what_to_do_type := x"13";  		--! read out the package counter
+  constant do_pkg_count_reset : what_to_do_type := x"14";  		--! reset the package counter
+  constant do_read_dma        : what_to_do_type := x"21";  		--! read from the DMA fifo
+  --constant do_read_available_data : what_to_do_type := x"24";  --! read available data
   signal what_to_do           : what_to_do_type;
 
   -- state signals
@@ -389,7 +389,6 @@ architecture Behavorial of ethernet_core_wrapper is
   signal nextpkg_count						: unsigned (7 downto 0) := x"00";--wait few clock cycles for the next package to prevent tx errors
 
   signal tx_count             : unsigned (15 downto 0) := x"0000";
-  signal tx_count_old			: unsigned (15 downto 0) := x"0000";
   signal waiting_for_write_count    : unsigned (11 downto 0) := x"000";
   signal timeout_for_waiting_count  : unsigned (7 downto 0) := x"00";
   signal rx_pkg_ctr_int       : std_logic_vector(31 downto 0);  -- how many UDP packages were received?
@@ -864,7 +863,7 @@ begin
     register_access_int, register_read_data_int, REGISTER_READ_READY,
     fifo_dma_dout, fifo_dma_empty,register_dma_count, more_than_one_pkg,dma_what_to_reply,
     -- state
-    state, rx_count, nextpkg_count, dma_reply_additional_information, tx_count, tx_hdr, tx_start_reg, tx_fin_reg,
+    state, rx_count, nextpkg_count, dma_reply_additional_information, tx_count, tx_data_count, tx_hdr, tx_start_reg, tx_fin_reg,
     waiting_for_write_count, rx_pkg_ctr_int,
     -- controls
     next_state, set_state, set_rx_count, set_nextpkg_count, set_dma_reply_additional_information, set_tx_count, set_hdr, set_tx_start,
@@ -1032,8 +1031,8 @@ begin
           else
             continue_to_send_data := '1';
           end if;
-		  elsif ( what_to_do = do_read_available_data) then
-	       continue_to_send_data := '1';
+		  --elsif ( what_to_do = do_read_available_data) then
+	     --  continue_to_send_data := '1';
 
         elsif ( what_to_do = x"aa" ) then
           next_state <= IDLE;
@@ -1117,15 +1116,15 @@ begin
                   when others => udp_tx_int.data.data_out <= (others => '0');
                 end case;
 
-					when do_read_available_data =>
-						case tx_count (1 downto 0) is
-							when "00"  => udp_tx_int.data.data_out <= do_read_available_data ;
-							when "01"	=> udp_tx_int.data.data_out (7 downto 1) <= (others =>'0');
-													   udp_tx_int.data.data_out (1 downto 0) <= REGISTER_DMA_COUNT (17 downto 16);
-							when "10"	=> udp_tx_int.data.data_out <= REGISTER_DMA_COUNT (15 downto 8);
-							when "11"	=> udp_tx_int.data.data_out <= REGISTER_DMA_COUNT (7 downto 0);
-							when others => udp_tx_int.data.data_out <= (others => '0');
-						end case;
+--					when do_read_available_data =>
+--						case tx_count (1 downto 0) is
+--							when "00"  => udp_tx_int.data.data_out <= do_read_available_data ;
+--							when "01"	=> udp_tx_int.data.data_out (7 downto 1) <= (others =>'0');
+--													   udp_tx_int.data.data_out (1 downto 0) <= REGISTER_DMA_COUNT (17 downto 16);
+--							when "10"	=> udp_tx_int.data.data_out <= REGISTER_DMA_COUNT (15 downto 8);
+--							when "11"	=> udp_tx_int.data.data_out <= REGISTER_DMA_COUNT (7 downto 0);
+--							when others => udp_tx_int.data.data_out <= (others => '0');
+--						end case;
 
               when do_pkg_count_reset =>
                 set_pkg_count <= RST;
@@ -1219,11 +1218,11 @@ begin
 				next_state <= IDLE;
 				set_state <= '1';
 			   reset_what_to_do <= '1';
-			 when do_read_available_data =>
-				reset_register_access <= '1';
-				next_state <= IDLE;
-				set_state <= '1';
-			   reset_what_to_do <= '1';
+--			 when do_read_available_data =>
+--				reset_register_access <= '1';
+--				next_state <= IDLE;
+--				set_state <= '1';
+--			   reset_what_to_do <= '1';
 
           when do_read_register =>
             reset_register_access <= '1';
@@ -1610,8 +1609,8 @@ begin
 
   -- get the DMA block data and transfer it to the UDP block data fifo
   get_dma_data : process (
-    glbl_rst, reset_dma_access, REGISTER_READ_READY, set_what_to_do,
-    fifo_dma_transfer_end, REGISTER_DMA_END, REGISTER_DMA_EMPTY, fifo_dma_full )
+    glbl_rst, reset_dma_access, REGISTER_READ_READY, set_what_to_do, register_dma_int, finish_get_dma_data, set_what_to_do_nextpkg,
+    fifo_dma_transfer_end, REGISTER_DMA_END, REGISTER_READ_DATA_DMA, REGISTER_DMA_EMPTY, fifo_dma_full )
   begin
     fifo_dma_reset <= reset_dma_access or glbl_rst;
     fifo_dma_din <= REGISTER_READ_DATA_DMA;
