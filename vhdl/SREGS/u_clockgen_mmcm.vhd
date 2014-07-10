@@ -17,7 +17,12 @@
 -- Revision:
 -- Revision 0.01 - File Created
 -- Additional Comments:
---
+-- IF the MMCM module does not work, check these issues:
+-- * The ROM Core needs a table of presetted values, loaded with a .coe file. This file might get lost if the 
+--   core is copied or modyfied.
+--   Make sure that in the core the coe file is loaded with the file "drp_rom.coe"
+-- * In the sofware part are the register values calculated. For the right calculation it is necessary to have there
+--   the same settings as in this file. Make sure the file "mrfdata_mmcmconf.h" has the same settings like below in this module. 
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -30,11 +35,16 @@ use work.util_pack.all;
 
 entity U_MMCM is
 Port (
-	CLKIN			: in	std_logic;	-- clock pin 66 MHz
+	CLKIN			: in	std_logic;	-- clock 66 MHz from ml605
+	CLK200		: in  STD_LOGIC;  -- clock 200 MHz from ml605
 	LCLK			: out	std_logic;	-- local clock
 	LRESET		: out	std_logic;	-- power on reset
 	BCLK			: out	std_logic;	-- MMCM_BASE
 	BRESET		: out	std_logic;	-- MMCM startup
+	FASTCLOCK	: out STD_LOGIC;	-- 550 MHz
+	FASTCLOCKB	: out STD_LOGIC;	-- 550 MHz
+	FASTCLOCK90	: out STD_LOGIC;	-- 550 MHz
+	FASTCLOCK90B: out STD_LOGIC;	-- 550 MHz
 	RC_A			: in	T_SLV5;		-- reconfiguration RAM address
 	RC_DO			: out	T_SLV16;		-- data out
 	RC_DI			: in	T_SLV16;		-- data in
@@ -47,9 +57,10 @@ Port (
 end U_MMCM;
 
 
-architecture Behavioral of U_MMCM is
+	architecture Behavioral of U_MMCM is
 
 	signal ilclk,ilrun,ilreset	: std_logic;	-- internal local clock
+	signal ilclk200				: std_logic;
 	signal clkfbout				: std_logic;
 	signal clkfbout_buf			: std_logic;
 	signal obclk,ibclk			: std_logic;
@@ -70,6 +81,12 @@ type T_DRP_STATE is (
 	signal drp_di	 			: T_SLV16;
 	signal drp_rom_a			: T_SLV5;
 	signal drp_locked			: std_logic;
+
+
+	signal speedclock2		: std_logic;
+	signal speedclock2b		: std_logic;
+	signal speedclock90		: STD_LOGIC;
+	signal speedclock90b		: STD_LOGIC;
 
 	signal ram_a				: T_SLV5;
 	signal ram_we				: std_logic;
@@ -100,11 +117,15 @@ component drp_ram
 end component;
 
 begin
-LCLK		<= ilclk;
-ilreset	<= not ilrun;
-LRESET	<= ilreset;
-BCLK		<= ibclk;
-BRESET	<= not obclk_lk;
+LCLK				<= ilclk;
+ilreset			<= not ilrun;    -- if the clock starts, ilrun goes from 0 to 1, ilreset goes from 1 to 0
+LRESET			<= ilreset;
+BCLK				<= ibclk;
+BRESET			<= not obclk_lk;
+FASTCLOCK 		<= speedclock2;
+FASTCLOCKB 		<= speedclock2b;
+FASTCLOCK90 	<= speedclock90;
+FASTCLOCK90b	<= speedclock90b;
 
 -- ========================================================================== --
 --										local 66MHz clock											--
@@ -113,18 +134,31 @@ BRESET	<= not obclk_lk;
 U10: IBUFG
 port map (
 	I => CLKIN,
-	O => ilclk);
+	O => ilclk
+	);
 
-U14: SRL16
+-- U11: IBUFG
+-- port map (
+-- 	I => CLK200,
+-- 	O => ilclk200
+-- );
+
+--ilclk200 <= CLK200;
+
+
+U14: SRL16  -- Shift register
 port map (
-	D		=> '1',
-	CLK	=> ilclk,
-	Q		=> ilrun,
-	A3		=> '1',
-	A2		=> '1',
+	D		=> '1',		-- data input
+	CLK	=> ilclk,	-- clock
+	--CLK	=> ilclk200,
+	Q		=> ilrun,  -- Data output
+	A3		=> '1',		-- A0 to A3 defines the lenght of the shift register
+	A2		=> '1',		-- if A* = 1111, shift register sit 16 bit long
 	A1		=> '1',
 	A0		=> '1');
 
+-- at startup, the register contains 0x0000. If the clock starts to run, it will be filled with '1'.
+-- after 16 clockcycles the data output (Q) changes from 0 to 1.
 
 -- ========================================================================== --
 --										alternative clock											--
@@ -137,15 +171,15 @@ generic map (
     CLOCK_HOLD           => FALSE,
 --    COMPENSATION         => "ZHOLD",
     STARTUP_WAIT         => FALSE,
-    DIVCLK_DIVIDE        => 1,
-    CLKFBOUT_MULT_F      => 15.000,
+    DIVCLK_DIVIDE        => 2, --2 (66 MHZ) -- 1 (200 MHz)
+    CLKFBOUT_MULT_F      => 27.000, --27 (66 MHZ) -- 5 (200 MHz)
     CLKFBOUT_PHASE       => 0.000,
     CLKFBOUT_USE_FINE_PS => FALSE,
-    CLKOUT0_DIVIDE_F     => 99.000,
+    CLKOUT0_DIVIDE_F     => 89.000, --89 (66 MHZ)-- 100 (200 MHz)
     CLKOUT0_PHASE        => 0.000,
     CLKOUT0_DUTY_CYCLE   => 0.500,
     CLKOUT0_USE_FINE_PS  => FALSE,
-    CLKOUT1_DIVIDE       => 99,
+    CLKOUT1_DIVIDE       => 99,		--99
     CLKOUT1_PHASE        => 0.000,
     CLKOUT1_DUTY_CYCLE   => 0.500,
     CLKOUT1_USE_FINE_PS  => FALSE,
@@ -170,8 +204,8 @@ generic map (
     CLKOUT6_DUTY_CYCLE   => 0.500,
     CLKOUT6_USE_FINE_PS  => FALSE,
     CLKIN1_PERIOD        => 15.1515,
-    CLKIN2_PERIOD        => 15.1515,
-    REF_JITTER1          => 0.010
+    --CLKIN1_PERIOD			 => 5.000,
+	 REF_JITTER1          => 0.010
 )
 port map (
     -- Output clocks
@@ -192,7 +226,10 @@ port map (
     CLKFBIN             => clkfbout_buf,
     CLKIN1              => ilclk,
     CLKIN2              => ilclk,
-    -- Tied to always select the primary input clock
+    --CLKIN1					=> ilclk200,
+	 --CLKIN2					=> ilclk200,
+
+	 -- Tied to always select the primary input clock
     CLKINSEL            => '1',
     -- Ports for dynamic reconfiguration
     DADDR               => "0000000",
@@ -252,6 +289,7 @@ port map (
 	a => ram_a,
 	d => RC_DI,
 	clk => ilclk,
+	--clk => ilclk200,
 	we => ram_we,
 	spo => ram_do
 );
@@ -263,7 +301,9 @@ RC_DO		<= ram_do;
 RC_RESET	<= drp_busy;
 
 process(ilclk) begin
+--process(ilclk200) begin
 if rising_edge(ilclk) then
+--if rising_edge(ilclk200) then
 	rom_do		<= rom_do0&ram_do;
 	drp_den		<= '0';
 	drp_dwe		<= '0';
@@ -328,20 +368,20 @@ generic map (
     CLOCK_HOLD           => FALSE,
 --    COMPENSATION         => "ZHOLD",
     STARTUP_WAIT         => FALSE,
-    DIVCLK_DIVIDE        => 3,
-    CLKFBOUT_MULT_F      => 40.000,
+    DIVCLK_DIVIDE        => 1,			-- Topix 50 MHz: 2 - ToPix 150 MHz 1
+    CLKFBOUT_MULT_F      => 6.000,		-- Topix 50 MHz: 8 - ToPix 150 MHz 6
     CLKFBOUT_PHASE       => 0.000,
     CLKFBOUT_USE_FINE_PS => FALSE,
-    CLKOUT0_DIVIDE_F     => 22.000,
+    CLKOUT0_DIVIDE_F     => 8.000,		-- Topix 50 MHz: 16 - ToPix 150 MHz 8
     CLKOUT0_PHASE        => 0.000,
     CLKOUT0_DUTY_CYCLE   => 0.500,
     CLKOUT0_USE_FINE_PS  => FALSE,
-    CLKOUT1_DIVIDE       => 22,
+    CLKOUT1_DIVIDE       => 3,     		--- Topix 50 MHz: 2 - ToPix 150 MHz 3
     CLKOUT1_PHASE        => 0.000,
     CLKOUT1_DUTY_CYCLE   => 0.500,
     CLKOUT1_USE_FINE_PS  => FALSE,
-    CLKOUT2_DIVIDE       => 22,
-    CLKOUT2_PHASE        => 0.000,
+    CLKOUT2_DIVIDE       => 3,     		-- 450 MHz
+    CLKOUT2_PHASE        => 90.000,
     CLKOUT2_DUTY_CYCLE   => 0.500,
     CLKOUT2_USE_FINE_PS  => FALSE,
     CLKOUT3_DIVIDE       => 22,
@@ -360,8 +400,8 @@ generic map (
     CLKOUT6_PHASE        => 0.000,
     CLKOUT6_DUTY_CYCLE   => 0.500,
     CLKOUT6_USE_FINE_PS  => FALSE,
-    CLKIN1_PERIOD        => 15.1515,
-    CLKIN2_PERIOD        => 15.1515,
+    --CLKIN1_PERIOD        => 15.1515,
+    CLKIN1_PERIOD        => 5.000,
     REF_JITTER1          => 0.010
 )
 port map (
@@ -370,10 +410,10 @@ port map (
     CLKFBOUTB           => open,
     CLKOUT0             => orc_clk,
     CLKOUT0B            => orc_clk180,
-    CLKOUT1             => open,
-    CLKOUT1B            => open,
-    CLKOUT2             => open,
-    CLKOUT2B            => open,
+    CLKOUT1             => speedclock2,
+    CLKOUT1B            => speedclock2b,
+    CLKOUT2             => speedclock90,
+    CLKOUT2B            => speedclock90b,
     CLKOUT3             => open,
     CLKOUT3B            => open,
     CLKOUT4             => open,
@@ -381,13 +421,16 @@ port map (
     CLKOUT6             => open,
     -- Input clock control
     CLKFBIN             => fbclk,
-    CLKIN1              => ilclk,
-    CLKIN2              => ilclk,
+    --CLKIN1              => ilclk,
+    --CLKIN2              => ilclk,
+    CLKIN1              => CLK200, --ilclk200,
+    CLKIN2              => CLK200, --ilclk200,
     -- Tied to always select the primary input clock
     CLKINSEL            => '1',
     -- Ports for dynamic reconfiguration
     DADDR               => drp_daddr,
     DCLK                => ilclk,
+    --DCLK                => ilclk200,
     DEN                 => drp_den,
     DI                  => drp_di,
     DO                  => drp_do,

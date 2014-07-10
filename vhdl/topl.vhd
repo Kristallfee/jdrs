@@ -302,7 +302,6 @@ architecture Behavioral of topl is
 	signal topix_clock	 		: std_logic;	
 	signal topix_ddr_out			: std_logic;
 	signal lreset					: std_logic;	
-	signal topix_reset		: std_logic;
 
 begin
 
@@ -424,7 +423,7 @@ begin
 	OB => FMC_LPC_LA25_N
 	);
 	
-	topix_reset <= lreset or topix_reset;
+	--topix_reset <= lreset ;
 	
 	OBUFDS_reset :  OBUFDS
 	port map(
@@ -691,7 +690,8 @@ begin
     LCLK        => sregs_clk,
     BASECLOCK   => gtx_clk_bufg,--CLK66,
     CLK66       => CLK66, -- a direct clock connection is needed for the MMCM
-    GRESET      => open,  -- a reset from the SREGS
+    CLK200		 => refclk_bufg, 
+	 GRESET      => open,  -- a reset from the SREGS
    -- P1MS        => pulse_1ms,
     LED         => USER_LED,
     USER_SWITCH => USER_SWITCH,
@@ -747,16 +747,16 @@ begin
   --  DMD_WR      	=> '0' --p_dt_den
   );
 
-  test_display_int <= (register_access and register_write_or_read) and
-                B2SL(regadr = std_logic_vector(to_unsigned(LED_REG, regadr'length)) );
+--  test_display_int <= (register_access and register_write_or_read) and
+--                B2SL(regadr = std_logic_vector(to_unsigned(LED_REG, regadr'length)) );
 
-  Test_Display : entity work.led_eine_sec
-  port map (
-    CLK       => gtx_clk_bufg,
-    TRIGGER   => test_display_int,
-    LED_TEST  => open,
-    LED_OUT   => test_display_output
-  );
+--  Test_Display : entity work.led_eine_sec
+--  port map (
+--    CLK       => gtx_clk_bufg,
+--    TRIGGER   => test_display_int,
+--    LED_TEST  => open,
+--    LED_OUT   => test_display_output
+--  );
 
   --USER_LED(0) <= test_display_output;
   --USER_LED(7 downto 1) <= (others => '0');

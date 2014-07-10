@@ -50,8 +50,9 @@ generic (
 );
 port (
 	LCLK				: out	std_logic;
-	BASECLOCK		: in  std_logic;	-- 125 MHz
-	CLK66				: in  std_logic; 	-- 66 MHz
+	BASECLOCK		: in  std_logic;	--! 125 MHz
+	CLK66				: in  std_logic; 	--! 66 MHz
+	CLK200			: in  std_logic;	--! 200 MHz
 	GRESET   		: out	std_logic;	-- general reset
 	--P1MS				: in	std_logic;	-- 1 ms pulse
 	LED				: out std_logic_vector(7 downto 0);
@@ -232,42 +233,90 @@ fi_wen <= 	topix_fifo_data_wr_en 			when choose_datapath(1 downto 0) ="00" else
 				fake_data_generator_wr_en		when choose_datapath(1 downto 0) ="11" else
 				topix_fifo_data_wr_en;
 
-ToPix_sdata : entity work.u_topix_sdata  
-	PORT MAP (
-	CLOCK									=> topixclock,
-	REGISTER_CLOCK						=> ilclk,
-	SDATA_IN								=> TPX_SDATA_IN,
-	SDATA_EN								=> TPX_SDATA_EN,
-	SDATA_OUT							=> TPX_SDATA_OUT,
-	REGISTER_MODULE_DATA				=> register_module_data_int,
-	MODULE_REGISTER_DATA				=> module_register_data_int,
-	REGISTER_MODULE_DATA_WR_EN		=> register_module_data_wr_en_int,
-	MODULE_REGISTER_DATA_RD_EN		=> module_register_data_rd_en_int,
-	MODULE_REGISTER_DATA_EMPTY		=> module_register_data_empty_int,
-	MODULE_REGISTER_DATA_COUNT		=> module_register_data_count_int,
-	REGISTER_MODULE_DATA_COUNT		=> register_module_data_count_int,
-	START									=> creg_sync_topixclk(9),
-	BUSY									=> tpx_inputsm_busy,
-	DATALENGTH							=> tpx_sc_inputsm_serial_data_length,
-	RESET									=> ilreset
-	);
+--ToPix_sdata : entity work.u_topix_sdata  
+--	PORT MAP (
+--	CLOCK									=> topixclock,
+--	REGISTER_CLOCK						=> ilclk,
+--	SDATA_IN								=> TPX_SDATA_IN,
+--	SDATA_EN								=> TPX_SDATA_EN,
+--	SDATA_OUT							=> TPX_SDATA_OUT,
+--	REGISTER_MODULE_DATA				=> register_module_data_int,
+--	MODULE_REGISTER_DATA				=> module_register_data_int,
+--	REGISTER_MODULE_DATA_WR_EN		=> register_module_data_wr_en_int,
+--	MODULE_REGISTER_DATA_RD_EN		=> module_register_data_rd_en_int,
+--	MODULE_REGISTER_DATA_EMPTY		=> module_register_data_empty_int,
+--	MODULE_REGISTER_DATA_COUNT		=> module_register_data_count_int,
+--	REGISTER_MODULE_DATA_COUNT		=> register_module_data_count_int,
+--	START									=> creg_sync_topixclk(9),
+--	BUSY									=> tpx_inputsm_busy,
+--	DATALENGTH							=> tpx_sc_inputsm_serial_data_length,
+--	RESET									=> ilreset
+--	);
+
+ToPix_sdata: entity work.u_topix_sdata 
+PORT MAP(
+	CLOCK_TOPIX 							=> topixclock,
+	CLOCK_REGISTER 						=> ilclk,
+	SDATA_OUT 								=> TPX_SDATA_IN,
+	SDATA_EN_OUT	 						=> TPX_SDATA_EN,
+	SDATA_IN 								=> TPX_SDATA_OUT,
+	REGISTER_MODULE_DATA_IN 			=> register_module_data_int,
+	MODULE_REGISTER_DATA_OUT 			=> module_register_data_int,
+	REGISTER_MODULE_DATA_WR_EN_IN 	=> register_module_data_wr_en_int,
+	MODULE_REGISTER_DATA_RD_EN_IN 	=> module_register_data_rd_en_int,
+	MODULE_REGISTER_DATA_EMPTY_OUT 	=> module_register_data_empty_int,
+	MODULE_REGISTER_DATA_COUNT_OUT 	=> module_register_data_count_int,
+	REGISTER_MODULE_DATA_COUNT_OUT 	=> register_module_data_count_int,
+	START_IN 								=> creg_sync_topixclk(9),
+	BUSY_OUT 								=> tpx_inputsm_busy,
+	DATALENGTH_IN 							=> tpx_sc_inputsm_serial_data_length,
+	RESET_IN 								=> ilreset
+);
+
+
 
 U_MMCM: entity work.U_MMCM
 port map (
-	CLKIN			=> CLK66, --BASECLOCK, -- ilclk ist eigentlich baseclock
-	LCLK			=> ilclk,  -- ilclk kommt aus mmcm raus
-	LRESET		=> ilreset,
+	CLKIN			=> CLK66, --
+	CLK200		=> CLK200,
+	LCLK			=> ilclk,  -- ilclk ebenfalls mit frequenz 66 mhz
+	LRESET		=> ilreset,  -- output
 	BCLK			=> clk10mhz,
 	BRESET		=> open,   -- not locked
+	FASTCLOCK	=> open, -- clock500mhz_i,
+	FASTCLOCKB	=> open, --clock500mhzb_i,
+	FASTCLOCK90	=> open, --clock500mhz90_i,
+	FASTCLOCK90B=> open, --clock500mhz90b_i,
 	RC_A			=> regadr(4 downto 0),
 	RC_DO			=> rc_do,
 	RC_DI			=> P_D(15 downto 0),
 	RC_WE			=> rc_we,
 	RC_START		=> rc_start,  --creg(5),
 	RC_CLK		=> topixclock,
-	RC_CLK180	=> open,
+	RC_CLK180	=> open, --topixclock180_i,
 	RC_RESET		=> drp_busy
 );
+
+
+--U_MMCM: entity work.U_MMCM
+--port map (
+--	CLKIN			=> CLK66, --BASECLOCK, -- ilclk ist eigentlich baseclock
+--	LCLK			=> ilclk,  -- ilclk kommt aus mmcm raus
+--	LRESET		=> ilreset,
+--	BCLK			=> clk10mhz,
+--	BRESET		=> open,   -- not locked
+--	RC_A			=> regadr(4 downto 0),
+--	RC_DO			=> rc_do,
+--	RC_DI			=> P_D(15 downto 0),
+--	RC_WE			=> rc_we,
+--	RC_START		=> rc_start,  --creg(5),
+--	RC_CLK		=> topixclock,
+--	RC_CLK180	=> open,
+--	RC_RESET		=> drp_busy
+--);
+
+
+
 rc_we		<= P_REG and P_WR and B2SL(regadr(regadr'high downto 5) = (SM_DRP/32));
 rc_start	<= P_REG and P_WR and B2SL(regadr = (SM_DRP+31));
 
@@ -599,7 +648,8 @@ fi_ren	<= not fi_empty and (not fi_valid or blk_rdy or (rdy_fi_d1 and not rdy_fi
 
 blk_rdy	<=    blk and not blk_zero and not P_WAIT and fi_valid;
 
-ev_datacount_int <= fi_datacount +('0'&fi_valid);
+--ev_datacount_int <= fi_datacount +('0'&fi_valid);
+ev_datacount_int <= fi_datacount;
 EV_DATACOUNT <= ev_datacount_int;
 
 --ldt_den	<= DT_ACK and fi_valid;
