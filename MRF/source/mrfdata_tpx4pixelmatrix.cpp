@@ -357,7 +357,7 @@ const unsigned int& TMrfData_Tpx4PixelMatrix::getMatrixRows() const
     return _matrixrowcout;
 }
 
-void TMrfData_Tpx4PixelMatrix::setPixConf(const unsigned int& col, const unsigned int& row, const std::string& item, const u_int32_t& value, bool matrix)
+void TMrfData_Tpx4PixelMatrix::setPixConf(const unsigned int& col, const unsigned int& row, const std::string& item, const u_int32_t& value, bool )
 {
     _localdata.at(col).at(row).find(item)->second.value = value;
 }
