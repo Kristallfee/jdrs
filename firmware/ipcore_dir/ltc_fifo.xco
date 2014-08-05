@@ -1,7 +1,7 @@
 ##############################################################
 #
-# Xilinx Core Generator version 14.1
-# Date: Fri May 25 07:33:55 2012
+# Xilinx Core Generator version 14.2
+# Date: Tue Jul 29 09:26:29 2014
 #
 ##############################################################
 #
@@ -21,7 +21,7 @@ SET addpads = false
 SET asysymbol = true
 SET busformat = BusFormatAngleBracketNotRipped
 SET createndf = false
-SET designentry = Verilog
+SET designentry = VHDL
 SET device = xc6vlx240t
 SET devicefamily = virtex6
 SET flowvendor = Other
@@ -32,8 +32,8 @@ SET package = ff1156
 SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -1
-SET verilogsim = true
-SET vhdlsim = false
+SET verilogsim = false
+SET vhdlsim = true
 # END Project Options
 # BEGIN Select
 SELECT Fifo_Generator xilinx.com:ip:fifo_generator:9.1
@@ -210,4 +210,4 @@ CSET wuser_width=1
 MISC pkg_timestamp=2012-04-13T16:13:14Z
 # END Extra information
 GENERATE
-# CRC: 30bd3d15
+# CRC: edded5d6

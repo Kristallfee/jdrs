@@ -1,30 +1,30 @@
 --------------------------------------------------------------------------------
---     This file is owned and controlled by Xilinx and must be used           --
---     solely for design, simulation, implementation and creation of          --
---     design files limited to Xilinx devices or technologies. Use            --
---     with non-Xilinx devices or technologies is expressly prohibited        --
---     and immediately terminates your license.                               --
+--    This file is owned and controlled by Xilinx and must be used solely     --
+--    for design, simulation, implementation and creation of design files     --
+--    limited to Xilinx devices or technologies. Use with non-Xilinx          --
+--    devices or technologies is expressly prohibited and immediately         --
+--    terminates your license.                                                --
 --                                                                            --
---     XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS"          --
---     SOLELY FOR USE IN DEVELOPING PROGRAMS AND SOLUTIONS FOR                --
---     XILINX DEVICES.  BY PROVIDING THIS DESIGN, CODE, OR INFORMATION        --
---     AS ONE POSSIBLE IMPLEMENTATION OF THIS FEATURE, APPLICATION            --
---     OR STANDARD, XILINX IS MAKING NO REPRESENTATION THAT THIS              --
---     IMPLEMENTATION IS FREE FROM ANY CLAIMS OF INFRINGEMENT,                --
---     AND YOU ARE RESPONSIBLE FOR OBTAINING ANY RIGHTS YOU MAY REQUIRE       --
---     FOR YOUR IMPLEMENTATION.  XILINX EXPRESSLY DISCLAIMS ANY               --
---     WARRANTY WHATSOEVER WITH RESPECT TO THE ADEQUACY OF THE                --
---     IMPLEMENTATION, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OR         --
---     REPRESENTATIONS THAT THIS IMPLEMENTATION IS FREE FROM CLAIMS OF        --
---     INFRINGEMENT, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS        --
---     FOR A PARTICULAR PURPOSE.                                              --
+--    XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS" SOLELY    --
+--    FOR USE IN DEVELOPING PROGRAMS AND SOLUTIONS FOR XILINX DEVICES.  BY    --
+--    PROVIDING THIS DESIGN, CODE, OR INFORMATION AS ONE POSSIBLE             --
+--    IMPLEMENTATION OF THIS FEATURE, APPLICATION OR STANDARD, XILINX IS      --
+--    MAKING NO REPRESENTATION THAT THIS IMPLEMENTATION IS FREE FROM ANY      --
+--    CLAIMS OF INFRINGEMENT, AND YOU ARE RESPONSIBLE FOR OBTAINING ANY       --
+--    RIGHTS YOU MAY REQUIRE FOR YOUR IMPLEMENTATION.  XILINX EXPRESSLY       --
+--    DISCLAIMS ANY WARRANTY WHATSOEVER WITH RESPECT TO THE ADEQUACY OF THE   --
+--    IMPLEMENTATION, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OR          --
+--    REPRESENTATIONS THAT THIS IMPLEMENTATION IS FREE FROM CLAIMS OF         --
+--    INFRINGEMENT, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A   --
+--    PARTICULAR PURPOSE.                                                     --
 --                                                                            --
---     Xilinx products are not intended for use in life support               --
---     appliances, devices, or systems. Use in such applications are          --
---     expressly prohibited.                                                  --
+--    Xilinx products are not intended for use in life support appliances,    --
+--    devices, or systems.  Use in such applications are expressly            --
+--    prohibited.                                                             --
 --                                                                            --
---     (c) Copyright 1995-2012 Xilinx, Inc.                                   --
---     All rights reserved.                                                   --
+--    (c) Copyright 1995-2014 Xilinx, Inc.                                    --
+--    All rights reserved.                                                    --
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- You must compile the wrapper file ltc_fifo.vhd when simulating
 -- the core, ltc_fifo. When compiling the wrapper file, be sure to
@@ -75,7 +75,7 @@ COMPONENT wrapped_ltc_fifo
 END COMPONENT;
 
 -- Configuration specification
-  FOR ALL : wrapped_ltc_fifo USE ENTITY XilinxCoreLib.fifo_generator_v8_1(behavioral)
+  FOR ALL : wrapped_ltc_fifo USE ENTITY XilinxCoreLib.fifo_generator_v9_1(behavioral)
     GENERIC MAP (
       c_add_ngc_constraint => 0,
       c_application_type_axis => 0,
@@ -195,12 +195,12 @@ END COMPONENT;
       c_prog_empty_thresh_assert_val_wrch => 1022,
       c_prog_empty_thresh_negate_val => 3,
       c_prog_empty_type => 0,
-      c_prog_empty_type_axis => 5,
-      c_prog_empty_type_rach => 5,
-      c_prog_empty_type_rdch => 5,
-      c_prog_empty_type_wach => 5,
-      c_prog_empty_type_wdch => 5,
-      c_prog_empty_type_wrch => 5,
+      c_prog_empty_type_axis => 0,
+      c_prog_empty_type_rach => 0,
+      c_prog_empty_type_rdch => 0,
+      c_prog_empty_type_wach => 0,
+      c_prog_empty_type_wdch => 0,
+      c_prog_empty_type_wrch => 0,
       c_prog_full_thresh_assert_val => 1021,
       c_prog_full_thresh_assert_val_axis => 1023,
       c_prog_full_thresh_assert_val_rach => 1023,
@@ -210,12 +210,12 @@ END COMPONENT;
       c_prog_full_thresh_assert_val_wrch => 1023,
       c_prog_full_thresh_negate_val => 1020,
       c_prog_full_type => 0,
-      c_prog_full_type_axis => 5,
-      c_prog_full_type_rach => 5,
-      c_prog_full_type_rdch => 5,
-      c_prog_full_type_wach => 5,
-      c_prog_full_type_wdch => 5,
-      c_prog_full_type_wrch => 5,
+      c_prog_full_type_axis => 0,
+      c_prog_full_type_rach => 0,
+      c_prog_full_type_rdch => 0,
+      c_prog_full_type_wach => 0,
+      c_prog_full_type_wdch => 0,
+      c_prog_full_type_wrch => 0,
       c_rach_type => 0,
       c_rd_data_count_width => 10,
       c_rd_depth => 1024,
@@ -228,6 +228,7 @@ END COMPONENT;
       c_reg_slice_mode_wach => 0,
       c_reg_slice_mode_wdch => 0,
       c_reg_slice_mode_wrch => 0,
+      c_synchronizer_stage => 2,
       c_underflow_low => 0,
       c_use_common_overflow => 0,
       c_use_common_underflow => 0,
