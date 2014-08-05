@@ -125,7 +125,7 @@ class TMrfData_8b
 		*/
 		void setBitBlock(const u_int32_t& position, const u_int32_t& length, const u_int8_t& value, const u_int32_t& offset = 0, const bool& reverse = false);
 
-		const u_int8_t& getBitBlock(const u_int32_t& position, const u_int32_t& length, const u_int32_t& offset = 0, const bool& reverse = false) const;
+		const u_int32_t& getBitBlock(const u_int32_t& position, const u_int32_t& length, const u_int32_t& offset = 0, const bool& reverse = false) const;
 
 		// Copies a size Bits long Data fragment to position.
 		//void copyFragment(const u_int32_t sourcestart, const u_int32_t destposition, const u_int32_t size, const mrf::registertype value);

@@ -167,7 +167,7 @@ void TMrfData_8b::setBitBlock(const u_int32_t& position, const u_int32_t& length
 	}
 }
 
-const u_int8_t& TMrfData_8b::getBitBlock(const u_int32_t& position, const u_int32_t& length, const u_int32_t& offset, const bool& reverse) const
+const u_int32_t& TMrfData_8b::getBitBlock(const u_int32_t& position, const u_int32_t& length, const u_int32_t& offset, const bool& reverse) const
 {
 	u_int32_t i;
 	_bitblock = 0;
