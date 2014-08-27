@@ -12,6 +12,7 @@ TARGET = topix4_main
 
 INCLUDEPATH += ../../MRF/source/ /home/ikp1/esch/fairsoft/FairRoot_Mohammad_build/include/ /private/esch/external_packages/FairSoft_build/include/
 
+#CONFIG -= qt
 
 TEMPLATE = app
 
@@ -93,6 +94,7 @@ HEADERS  += mainwindow.h \
 	 ../../MRF/source/mrfdata_afei3hits.h \
 	 ../../MRF/source/mrfdata_afei3.h \
 	 ../../MRF/source/stringseparator.h \
+    helper_functions.h
 
 
 QMAKE_MOC = $$QMAKE_MOC -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
@@ -100,7 +102,10 @@ QMAKE_MOC = $$QMAKE_MOC -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 FORMS    += mainwindow.ui
 OBJECTS_DIR=generated_files
 
-LIBS += -L/private/esch/external_packages/FairSoft_build/lib -lzmq -lboost_thread -lboost_timer -lboost_system
-LIBS += -L/home/ikp1/esch/fairsoft/FairRoot_Mohammad_build/lib -lFairMQ
+#QMAKE_LFLAGS_DEBUG += /NODEFAULTLIB:boost_thread
 
+#QMAKE_LIBDIR_FLAGS = -L/private/esch/external_packages/FairSoft_build/ -lboost_timer -lboost_system -lboost_thread
+
+LIBS += -L/private/esch/external_packages/FairSoft_build/lib -lzmq -lboost_thread -lboost_timer -lboost_system -lboost_chrono
+LIBS += -L/home/ikp1/esch/fairsoft/FairRoot_Mohammad_build/lib -lFairMQ
 

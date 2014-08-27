@@ -38,24 +38,24 @@ namespace udpDataFlag {
     // bytes to the left.
 
     // general flags
-    static const u_int32_t nothing	= 0x00 << 3*8;  //!< Well, nothing...
-    static const u_int32_t ping		= 0x01 << 3*8;  //!< Send a ping signal.
-    static const u_int32_t pong		= 0x02 << 3*8;  //!< A pong is the response to a ping signal.
-    static const u_int32_t check	= 0x03 << 3*8;  //!< Everything ok.
-    static const u_int32_t error	= 0x04 << 3*8;  //!< An error has occured.
-    static const u_int32_t timeout	= 0x05 << 3*8;  //!< There was a timeout.
+    static const u_int64_t nothing	= 0x00 << 3*8;  //!< Well, nothing...
+    static const u_int64_t ping		= 0x01 << 3*8;  //!< Send a ping signal.
+    static const u_int64_t pong		= 0x02 << 3*8;  //!< A pong is the response to a ping signal.
+    static const u_int64_t check	= 0x03 << 3*8;  //!< Everything ok.
+    static const u_int64_t error	= 0x04 << 3*8;  //!< An error has occured.
+    static const u_int64_t timeout	= 0x05 << 3*8;  //!< There was a timeout.
 
     // flags for register handling
-    static const u_int32_t registerRead		= 0x11 << 3*8;  //!< We want to read out a register value.
-    static const u_int32_t registerWrite	= 0x12 << 3*8;  //!< Set a register with a new value.
-    static const u_int32_t pkgCountRead		= 0x13 << 3*8;  //!< Read out the package counter in the ML605.
-    static const u_int32_t pkgCountReset	= 0x14 << 3*8;  //!< Reset the package counter in the ML605.
-    static const u_int32_t readDMA              = 0x21 << 3*8;  //!< Read from the DMA buffer (multiple data with one request)
-    static const u_int32_t DMA_reply            = 0x22 << 3*8;  //!< Receive answer for a dma read
-    static const u_int32_t DMA_last_reply       = 0x23 << 3*8;  //!< Receive last package of dma reply
-    static const u_int32_t do_read_available_data       = 0x24 << 3*8;  //!< receive number of available 32 bits data words
-    static const u_int32_t do_produce_dummydata         = 0x25 << 3*8;  //!< to start or stop production of dummy data (0-> stop, 1->start)
-    static const u_int32_t do_config_data         = 0x26 << 3*8;  //!< configure data channel (0-> apv, 1-> dummy)
+    static const u_int64_t registerRead		= 0x11 << 3*8;  //!< We want to read out a register value.
+    static const u_int64_t registerWrite	= 0x12 << 3*8;  //!< Set a register with a new value.
+    static const u_int64_t pkgCountRead		= 0x13 << 3*8;  //!< Read out the package counter in the ML605.
+    static const u_int64_t pkgCountReset	= 0x14 << 3*8;  //!< Reset the package counter in the ML605.
+    static const u_int64_t readDMA              = 0x21 << 3*8;  //!< Read from the DMA buffer (multiple data with one request)
+    static const u_int64_t DMA_reply            = 0x2200000000;  //!< Receive answer for a dma read
+    static const u_int64_t DMA_last_reply       = 0x2300000000;  //!< Receive last package of dma reply
+    static const u_int64_t do_read_available_data       = 0x24 << 3*8;  //!< receive number of available 32 bits data words
+    static const u_int64_t do_produce_dummydata         = 0x25 << 3*8;  //!< to start or stop production of dummy data (0-> stop, 1->start)
+    static const u_int64_t do_config_data         = 0x26 << 3*8;  //!< configure data channel (0-> apv, 1-> dummy)
 
 }
 
@@ -81,6 +81,7 @@ class TMrfGal_Udp : virtual public TMrfGal
     public:
         TMrfGal_Udp();
         virtual ~TMrfGal_Udp();
+
 
         //! Opens a device.
         /*!
@@ -342,6 +343,7 @@ class TMrfGal_Udp : virtual public TMrfGal
         TMrfData _genericBuffer;
 
         const static bool _verbose = false;
+
 };
 
 #endif // __MRFGAL_UDP_H__

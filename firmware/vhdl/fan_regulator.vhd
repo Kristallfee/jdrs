@@ -184,6 +184,15 @@ begin
     variable tmp_temp_celcius  : std_logic_vector(8 downto 0);
   begin
     if rising_edge(CLK) then
+
+      -- in simulation temp_data_ready never gets high. To prevent the output signals beeing undefined in simulation, the following definition is set.
+
+      -- pragma synthesis_off 
+      TEMP_OUT      <= "01101010";
+      TEMP_ADC_OUT  <= "1010000000";
+
+      -- pragma synthesis_on
+
       if temp_data_ready = '1' then
         tmp_temp_current := to_integer(unsigned( temp_data_out(15 downto 6) ));
 

@@ -52,10 +52,13 @@ private:
 
 private slots:
 
+        void on_pushButton_ConfigFakeData_clicked();
+
         void on_pushButton_start_fairmq_sm_clicked();
         void on_pushButton_pause_fairmq_sm_clicked();
         void on_pushButton_start_fairmq_thread_clicked();
         void on_pushButton_stop_fairmq_thread_clicked();
+        void on_pushButton_stop_fairmq_sm_clicked();
 
         void itemcolormatrix(QTableWidgetItem *item, int range=1);
 

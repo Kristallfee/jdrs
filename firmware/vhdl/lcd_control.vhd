@@ -487,9 +487,9 @@ begin
 
 
   what_to_display : process (RST, CLK, mode, hours_tens, hours_ones, minutes_tens, minutes_ones, seconds_tens, seconds_ones ) is
-    variable temp_bcd     : std_logic_vector(11 downto 0);
-    variable temp_adc_bcd   : std_logic_vector(11 downto 0);
-    variable fan_speed_bcd    : std_logic_vector(11 downto 0);
+    variable temp_bcd     : std_logic_vector(11 downto 0) := "000000000000";
+    variable temp_adc_bcd   : std_logic_vector(11 downto 0):= "000000000000";
+    variable fan_speed_bcd    : std_logic_vector(11 downto 0):= "000000000000";
   begin
     if rising_edge(CLK) then
       if (RST = '1') then

@@ -118,7 +118,7 @@ bool TMrfGal_Udp::deviceIsOnline() const
 int TMrfGal_Udp::doIoctl(const int) const
 {
     // actually I don't know what to do with that
-//    return _sendBuffer(request);
+    // return _sendBuffer(request);
     return 0;
 }
 
@@ -159,7 +159,11 @@ int TMrfGal_Udp::doIoctl(const int) const
 int TMrfGal_Udp::doIoctl(const int &requestType, void *arg) const
 {
     if ( (u_int32_t)requestType != udpDataFlag::readDMA )
+    {
+        std::cout << std::hex << (u_int32_t)requestType << std::endl;
+        std::cout << std::hex << udpDataFlag::readDMA << std::endl;
         return -1;
+    }
 
     // put together the request to send
 
@@ -181,29 +185,30 @@ int TMrfGal_Udp::doIoctl(const int &requestType, void *arg) const
     words = req->wordcount;
     u_int32_t wordsread = 0;
     u_int64_t CmdWord = 0;
-    u_int64_t CmdWordCompare = 0;
+    u_int64_t CmdWordCompare =0 ;
 
-    for(u_int j = 0; words > j*294 && ((CmdWord & 0xff000000) != udpDataFlag::DMA_last_reply); j++){
+    for(u_int j = 0; words > j*294 && ((CmdWord & 0xff00000000) != udpDataFlag::DMA_last_reply); j++){
 
         u_int32_t wordsread_temp = 0;
-        if ( _readBuffer(req->memoryAddress + (wordsread), ((req->wordcount))+5, CmdWord, &wordsread_temp) != 0 ) {
-          //  errcode = mrf_error::read_failed;
-           // std::cout<<"CmdWord: "<<std::hex<<CmdWord<<",  wordsread: "<<std::dec<<wordsread<<std::endl;
-            u_int32_t *returnSingleBlock;
-            returnSingleBlock = (u_int32_t*)(req->memoryAddress + (wordsread ) - 5); //show last word
+  //      if ( _readBuffer(req->memoryAddress + (wordsread), (req->wordcount)+5, CmdWord, &wordsread_temp) != 0 ) {
+        if ( _readBuffer(req->memoryAddress + (wordsread), (req->wordcount), CmdWord, &wordsread_temp) != 0 ) {
+          //  u_int32_t *returnSingleBlock;
+          //  returnSingleBlock = (u_int32_t*)(req->memoryAddress + (wordsread ) - 5); //show last word
             break;
         }
-        //if(wordsread_temp != 367){std::cout<<"package not full, Received Words: "<<std::dec<<wordsread_temp<<std::endl;}
-        if(CmdWord-CmdWordCompare != 1 && CmdWordCompare != 0 && (CmdWord & 0xff000000) != udpDataFlag::DMA_last_reply)
+
+        if(((CmdWord &0x00ffff0000 )-(CmdWordCompare  &0x00ffff0000) != 65536) && CmdWordCompare !=0)
         {
-         //   std::cout<<std::endl<<"CmdWord is: 0x"<<std::hex<<CmdWordCompare<<std::endl;
-         //   std::cout<<"CmdWord is: 0x"<<std::hex<<CmdWord<<std::endl;
+            std::cout << "Error " << std::endl;
+            std::cout << "Old CmdWord is: 0x"<<std::hex<<CmdWordCompare<<std::endl;
+            std::cout << "CmdWord     is: 0x"<<std::hex<<CmdWord<<std::endl;
+            std::cout << " (CmdWord &0x00ffff0000 )-(CmdWordCompare  &0x00ffff0000) " << (CmdWord &0x00ffff0000 )-(CmdWordCompare  &0x00ffff0000) << std::endl;
+
         }
         CmdWordCompare = CmdWord;
         wordsread += wordsread_temp;
     }
     req->wordcount=wordsread;
-  //  std::cout<<"wordsread: "<<req->wordcount<<std::endl;
     return 0;
 }
 
@@ -476,7 +481,6 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
             return -1;
         }
 
-
         char out[64];
         unsigned char *byte;
         if ( _verbose ) {
@@ -486,31 +490,39 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
         // check that the returning 32 bit integers have the correct byte order
         u_int8_t *recvSingleBlock, *returnSingleBlock;
 
+        cmdword=0;
 
-       // cmdword = ntohl(*((u_int64_t*)(&recv[0])));
-
-        char blubb[5];
-
-        for ( unsigned int j=0; j< 6; j++)
+        for ( unsigned int j=0; j< 5; j++)
         {
-            blubb[j] = ntohl(*((u_int8_t*)(&recv[j])));
+            cmdword = cmdword << 8;
+            cmdword += (u_int64_t)((unsigned char)recv[j]);
+
+            if ( _verbose ){
+                sprintf( out, "word %d:  ",j );
+                byte = (unsigned char*)&recv[j];
+                //for ( int j = 0; j < 5; j++ ) { sprintf( out, "%s %02x", out, *(byte+j) ); }
+                sprintf( out, "%s %02x", out, *(byte) );
+                std::cout << out << std::endl;
+            }
         }
 
-        cmdword = (u_int64_t)blubb;
+        if ( _verbose ){
+            sprintf( out, "word 1-5:  ");
+            sprintf( out, "%s %02lx", out, cmdword );
+            std::cout << out << std::endl;
+        }
 
-        for ( unsigned int i = 5; i < length && i < nBytesRecv; i++ ) {
-//            recvSingleBlock = (u_int32_t*)(dataStartAddress+i);
-//            *recvSingleBlock = ntohl(*recvSingleBlock);
+        for ( unsigned int i = 0; i < length && i < nBytesRecv; i++ ) {
+        //    for ( unsigned int i = 5; i < length && i < nBytesRecv; i++ ) {
+            recvSingleBlock = (u_int8_t*)(&recv[i]);
+           // returnSingleBlock = (u_int8_t*)(dataStartAddress+i-5); //change StartAddress or previous data is overwritten
+            returnSingleBlock = (u_int8_t*)(dataStartAddress+i); //change StartAddress or previous data is overwritten
 
-                    recvSingleBlock = (u_int8_t*)(&recv[i]);
-                    returnSingleBlock = (u_int8_t*)(dataStartAddress+i-5); //change StartAddress or previous data is overwritten
-                  //  *returnSingleBlock = ntohl(*recvSingleBlock);
-                     *returnSingleBlock = *recvSingleBlock;
+            *returnSingleBlock = *recvSingleBlock;
 
             if ( _verbose ) {
                 sprintf( out, "word %d:  ", i );
                 byte = (unsigned char*)(recvSingleBlock);
-                //for ( int j = 0; j < 5; j++ ) { sprintf( out, "%s %02x", out, *(byte+j) ); }
                 sprintf( out, "%s %02x", out, *(byte) );
                 std::cout << out << std::endl;
             }
@@ -518,7 +530,8 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
 
         // if an address for the wordcount is given, set it to the read words // + 294 times the previously received packages
         if ( wordcount != 0 ) {
-            *wordcount = (nBytesRecv)-5;
+            //*wordcount = (nBytesRecv)-5;
+            *wordcount = (nBytesRecv);
         }
 
         return 0;
@@ -606,7 +619,7 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
             returnSingleBlock = (u_int32_t*)(dataStartAddress+i);
             *returnSingleBlock = ntohl(*recvSingleBlock);
 
-            std::cout << "somewhere here 2" << std::endl;
+         //   std::cout << "somewhere here 2" << std::endl;
 
             if ( _verbose ) {
                 sprintf( out, "word %d:  ", i/4 );

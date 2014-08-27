@@ -1331,7 +1331,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_fillFifo">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>710</x>
         <y>340</y>
         <width>181</width>
         <height>41</height>
@@ -1622,7 +1622,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>390</y>
+        <y>470</y>
         <width>191</width>
         <height>51</height>
        </rect>
@@ -1635,7 +1635,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>510</y>
+        <y>570</y>
         <width>191</width>
         <height>51</height>
        </rect>
@@ -1647,17 +1647,27 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="gridLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>600</y>
-        <width>261</width>
-        <height>61</height>
+        <x>340</x>
+        <y>650</y>
+        <width>371</width>
+        <height>51</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="2">
+        <widget class="QPushButton" name="pushButton_fillFifo_3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Change Message Size</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit_fairmq_message_size">
          <property name="text">
-          <string>500</string>
+          <string>20000</string>
          </property>
         </widget>
        </item>
@@ -1668,14 +1678,38 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="pushButton_fillFifo_4">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Set Watermark</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_fairmq_watermark">
+         <property name="text">
+          <string>1000</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Watermark</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QPushButton" name="pushButton_pause_fairmq_sm">
       <property name="geometry">
        <rect>
-        <x>380</x>
-        <y>460</y>
-        <width>141</width>
+        <x>480</x>
+        <y>530</y>
+        <width>91</width>
         <height>31</height>
        </rect>
       </property>
@@ -1686,14 +1720,87 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_start_fairmq_sm">
       <property name="geometry">
        <rect>
-        <x>530</x>
-        <y>460</y>
-        <width>141</width>
+        <x>380</x>
+        <y>530</y>
+        <width>91</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>Start SM</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_stop_fairmq_sm">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>530</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Stop SM</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_ConfigFakeData">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>360</y>
+        <width>181</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Config Fake Data</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_fakedata_cyclesbetweenmessages">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>410</y>
+        <width>53</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ffffff</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_transportvalue_3">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>400</y>
+        <width>80</width>
+        <height>39</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>80</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Cycles:  0x</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
     </widget>
@@ -2368,7 +2475,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1226</width>
-     <height>19</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>

@@ -36,6 +36,10 @@ private:
     TMrfCal_Topix4 _topix4control;
     QTextEdit * _window;
 
+    u_int64_t CmdWordOld;
+    u_int64_t previous_le_dataword;
+    u_int64_t previous_te_dataword;
+
 };
 
 #endif // TOPIX4_FAIRMQ_READOUT_H

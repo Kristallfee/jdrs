@@ -1,4 +1,3 @@
-
 #include "mainwindow.h"
 #include "mrftools.h"
 #include "qmrftools.h"
@@ -7,7 +6,6 @@
 #include <QTextStream>
 #include "mrfdata_8b.h"
 #include "FairMQTransportFactoryZMQ.h"
-
 
 using mrftools::getIntBit;
 using mrftools::setIntBit;
@@ -36,10 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_topix4clearcommand_clicked();
     _end_readout = false;
     on_toolButton_refreshOwnIP_clicked();
+
 }
 
 MainWindow::~MainWindow()
 {
+    fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::END);
     delete ui;
 }
 
@@ -51,6 +51,7 @@ void MainWindow::on_pushButton_start_fairmq_sm_clicked()
 void MainWindow::on_pushButton_pause_fairmq_sm_clicked()
 {
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::PAUSE);
+    QCoreApplication::processEvents();
 }
 
 void MainWindow::on_pushButton_start_fairmq_thread_clicked()
@@ -58,22 +59,25 @@ void MainWindow::on_pushButton_start_fairmq_thread_clicked()
     DoFairMQReadout();
 }
 
-void MainWindow::on_pushButton_stop_fairmq_thread_clicked()
+void MainWindow::on_pushButton_stop_fairmq_sm_clicked()
 {
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::STOP);
+}
+
+void MainWindow::on_pushButton_stop_fairmq_thread_clicked()
+{
 
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::END);
     fairmqreadout.CloseASICConnection();
+    //fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::Shutdown());
 }
 
 void MainWindow::DoFairMQReadout()
 {
-
     if (_topix4control.deviceIsOpen())
     {
        on_pushButton_Disconnect_UDP_clicked();
     }
-
 
     QStringList ownIP = ui->comboBox_ownIPAdresses->currentText().split(" ");
     QString connectionParameter = QString("%1,%2,%3,%4")
@@ -83,7 +87,6 @@ void MainWindow::DoFairMQReadout()
             .arg(ui->spinBox_remotePort->value());
 
     FairMQTransportFactory* transportFactory = new FairMQTransportFactoryZMQ();
-
 
     fairmqreadout.SetOutputWindow(ui->textEdit_Dmadata);
     fairmqreadout.SetTransport(transportFactory);
@@ -96,7 +99,7 @@ void MainWindow::DoFairMQReadout()
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::INIT);
 
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputSocketType,"push" , 0);
-    fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputSndBufSize,1000);
+    fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputSndBufSize,ui->lineEdit_fairmq_watermark->text().toInt());
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputMethod,"connect");
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputAddress,"tcp://localhost:5565");
 
@@ -104,12 +107,6 @@ void MainWindow::DoFairMQReadout()
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::SETINPUT);
 
     fairmqreadout.OpenASICConnection(connectionParameter);
-
-    fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::RUN);
-
-
-
-
 }
 
 void MainWindow::itemcolormatrix(QTableWidgetItem *item, int range)
@@ -161,6 +158,21 @@ void MainWindow::Print(const QString& str)
         ui->textEdit_Info->append(str);
         //statusbar->showMessage(str, 5000);
     }
+}
+
+void MainWindow::on_pushButton_ConfigFakeData_clicked()
+{
+    if (!_topix4control.deviceIsOpen())
+    {
+       on_pushButton_Connect_UDP_clicked();
+    }
+
+    _topix4control.write(0x4d4, 0x3);
+    _topix4control.write(0x4d8, ui->lineEdit_fakedata_cyclesbetweenmessages->text().toInt(0,16)  );
+    _topix4control.write(0x8, 0x400);
+    _topix4control.write(0x4c8,0x3);
+    //   _topixcrtl.write(ui->lineEdit_Registeraddress->text().toUInt(0, 16), ui->lineEdit_Registervalue->text().toUInt(0, 16));
+    Error();
 }
 
 // *************************************************************************************
@@ -245,7 +257,7 @@ void MainWindow::on_pushButton_Readdmadata_clicked()
     for(u_int i=0; i< tempdaten.getNumWords();i+=5)
     {
       // ui->textEdit_Dmadata->append(QString::fromStdString(tempdaten.exportBinString()));
-        ui->textEdit_Dmadata->append(QString::number((u_int16_t)tempdaten.getWord(i),2)+" "+ QString::number((u_int16_t)tempdaten.getWord(i+1),2)+" "+QString::number((u_int16_t)tempdaten.getWord(i+2),2)+" "+QString::number((u_int16_t)tempdaten.getWord(i+3),2)+" "+QString::number((u_int16_t)tempdaten.getWord(i+4),2));
+        ui->textEdit_Dmadata->append(QString::number((u_int16_t)tempdaten.getWord(i),16)+" "+ QString::number((u_int16_t)tempdaten.getWord(i+1),16)+" "+QString::number((u_int16_t)tempdaten.getWord(i+2),16)+" "+QString::number((u_int16_t)tempdaten.getWord(i+3),16)+" "+QString::number((u_int16_t)tempdaten.getWord(i+4),16));
 
     }
 }
@@ -823,7 +835,7 @@ void MainWindow::on_pushButton_p3pdacclear_clicked()
 void MainWindow::on_pushButton_p3configtothreshold_clicked()
 {
     int Max_Pixel=0;
-    int Best_DAC, Best_DAC_Sign;
+    int Best_DAC=0, Best_DAC_Sign=0;
 
     for(int s=0; s<8 ; s++)
     {

@@ -80,7 +80,7 @@ public:
     virtual void writeRemoteData(const TMrfData& data) const;
 
     //! Retrieves data from the readout board's buffer.
-    virtual void readRemoteData(TMrfData_8b &data) const;
+    virtual void readRemoteData(TMrfData_8b &data);
 
     virtual void triggerRead(const u_int32_t& triggercount, const bool& withlo) const;
 

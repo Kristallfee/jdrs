@@ -15,7 +15,7 @@ void TMrfTal_RBTopix4::writeRemoteData(const TMrfData& data) const
         writeData(tpx_address::input, data);
 }
 
-void TMrfTal_RBTopix4::readRemoteData(TMrfData_8b& data) const
+void TMrfTal_RBTopix4::readRemoteData(TMrfData_8b& data)
 {
         readOutputBuffer(data, data.getNumWords());
 }

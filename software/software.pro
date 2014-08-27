@@ -2,4 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     topix4_main \
-    FairMQ_Receiver
+    FairMQ_Receiver \
+    DataMonitor
+
+

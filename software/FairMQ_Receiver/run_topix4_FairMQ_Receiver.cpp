@@ -44,10 +44,10 @@ static void s_catch_signals (void)
 
 int main(int argc, char** argv)
 {
-    if ( argc != 9 ) {
-        cout << "Usage: testToPix4_FairMQ_Receiver ID eventSize eventRate numIoTreads\n"
-             << "\t\toutputSocketType outputSndBufSize outputMethod outputAddress\n"
-             << endl;
+    if ( argc != 7 ) {
+        cout << "Usage: run_topix4_fairmq_receiver \tID numIoTreads\n"
+                  << "\t\tinputSocketType inputRcvBufSize inputMethod inputAddress\n"
+                  << endl;
         return 1;
     }
 
@@ -68,37 +68,28 @@ int main(int argc, char** argv)
      topix4_receiver.SetProperty(topix4_fairmq_receiver::Id, argv[i]);
      ++i;
 
-     int eventSize;
-     stringstream(argv[i]) >> eventSize;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::EventSize, eventSize);
-     ++i;
-
-     int eventRate;
-     stringstream(argv[i]) >> eventRate;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::EventRate, eventRate);
-     ++i;
-
      int numIoThreads;
      stringstream(argv[i]) >> numIoThreads;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::NumIoThreads, numIoThreads);
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::EventSize, numIoThreads);
      ++i;
 
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::NumInputs, 0);
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::NumOutputs, 1);
+
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::NumInputs, 1);
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::NumOutputs, 0);
 
 
      topix4_receiver.ChangeState(topix4_fairmq_receiver::INIT);
 
 
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::OutputSocketType, argv[i], 0);
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::InputSocketType, argv[i], 0);
      ++i;
-     int outputSndBufSize;
-     stringstream(argv[i]) >> outputSndBufSize;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::OutputSndBufSize, outputSndBufSize, 0);
+     int inputRcvBufSize;
+     stringstream(argv[i]) >> inputRcvBufSize;
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::InputRcvBufSize, inputRcvBufSize, 0);
      ++i;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::OutputMethod, argv[i], 0);
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::InputMethod, argv[i], 0);
      ++i;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::OutputAddress, argv[i], 0);
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::InputAddress, argv[i], 0);
      ++i;
 
 

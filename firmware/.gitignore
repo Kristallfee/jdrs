@@ -13,7 +13,7 @@
 !vhdl/*/*/
 !vhdl/*/*/*/
 !vhdl/*/*/*/*/
-!ipcore_dir/
+!ipcore_dir/*/*/*/
 !testbench/
 !*.vhd
 !*.ucf

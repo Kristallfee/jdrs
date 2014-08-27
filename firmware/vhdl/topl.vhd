@@ -207,101 +207,90 @@ entity topl is
     -- Design controls and output
     -------------------------------
     USER_LED            : out std_logic_vector (7 downto 0);  	--! 8 GPIO LEDs
+    USER_LED_C			: out std_logic;						--! Center LED
     USER_SWITCH         : in  std_logic_vector (4 downto 0)		--! 8 GPIO Switches
   );
 end topl;
 
 architecture Behavioral of topl is
 
-  signal refclk_bufg    : std_logic;
-  signal gtx_clk_bufg   : std_logic;
-  signal clk_locked     : std_logic;
-  signal clk_50         : std_logic;
+	signal refclk_bufg_200    : std_logic;
+	signal gtx_clk_bufg   : std_logic;
+	signal clk_locked     : std_logic;
+	signal clk_50         : std_logic;
 
-  signal pulse_1ms      : std_logic;
-  signal pulse_100ms    : std_logic;
+	signal pulse_1ms      : std_logic;
+	signal pulse_100ms    : std_logic;
 
-  -- the register information bus
-  signal register_access        : std_logic;
-  signal register_access_ready  : std_logic;
-  signal register_write_or_read : std_logic; -- 0: read, 1: write
-  signal register_addr          : std_logic_vector(15 downto 0);
-  signal register_read_data     : std_logic_vector(31 downto 0);
-  signal register_read_data_DMA : std_logic_vector(39 downto 0);
-  signal register_write_data    : std_logic_vector(31 downto 0);
-  signal register_dma           : std_logic;
-  signal register_dma_wait      : std_logic;
-  signal register_dma_end       : std_logic;
-  signal register_dma_empty     : std_logic;
-  signal register_dma_count     : std_logic_vector(17 downto 0);
-  -- signal register_dt_ack       : std_logic;
+	-- the register information bus
+	signal register_access        : std_logic;
+	signal register_access_ready  : std_logic;
+	signal register_write_or_read : std_logic; -- 0: read, 1: write
+	signal register_addr          : std_logic_vector(15 downto 0);
+	signal register_read_data     : std_logic_vector(31 downto 0);
+	signal register_read_data_DMA : std_logic_vector(39 downto 0);
+	signal register_write_data    : std_logic_vector(31 downto 0);
+	signal register_dma           : std_logic;
+	signal register_dma_wait      : std_logic;
+	signal register_dma_end       : std_logic;
+	signal register_dma_empty     : std_logic;
+	signal register_dma_count     : std_logic_vector(17 downto 0);
+	-- signal register_dt_ack       : std_logic;
 
-  -- LCD stuff
-  constant lcd_mode_default : std_logic_vector(2 downto 0) := "001";
-  signal lcd_ctrl           : std_logic_vector(2 downto 0);
-  signal lcd_mode           : std_logic_vector(2 downto 0) := lcd_mode_default;
-  signal lcd_db             : std_logic_vector(7 downto 4);
+	-- LCD stuff
+	constant lcd_mode_default : std_logic_vector(2 downto 0) := "001";
+	signal lcd_ctrl           : std_logic_vector(2 downto 0);
+	signal lcd_mode           : std_logic_vector(2 downto 0) := lcd_mode_default;
+	signal lcd_db             : std_logic_vector(7 downto 4);
 
-  -- ouput for the LCD
-  signal temp_int           : std_logic_vector(7 downto 0);
-  signal temp_adc_int       : std_logic_vector(9 downto 0);
-  signal fan_speed_int      : std_logic_vector(5 downto 0);
-  signal udp_pkg_ctr        : std_logic_vector(31 downto 0);
+	-- ouput for the LCD
+	signal temp_int           : std_logic_vector(7 downto 0);
+	signal temp_adc_int       : std_logic_vector(9 downto 0);
+	signal fan_speed_int      : std_logic_vector(5 downto 0);
+	signal udp_pkg_ctr        : std_logic_vector(31 downto 0);
 
-  -- make the register information visible on the LCD for some clock cycles
-  constant lcd_enable_register_display    : std_logic := '1';
-  constant register_display_counter_max   : integer := 125000000*2;
-  signal register_display_counter         : integer range 0 to register_display_counter_max := 0;
-  signal register_display_counter_enable  : std_logic := '0';
-  signal register_display_counter_running : std_logic := '0';
+	-- make the register information visible on the LCD for some clock cycles
+	constant lcd_enable_register_display    : std_logic := '1';
+	constant register_display_counter_max   : integer := 125000000*2;
+	signal register_display_counter         : integer range 0 to register_display_counter_max := 0;
+	signal register_display_counter_enable  : std_logic := '0';
+	signal register_display_counter_running : std_logic := '0';
 
-  -- register buffer signals, since the information
-  -- should be visible on the LCD more than a clock cycle
-  signal register_addr_buf          : std_logic_vector(11 downto 0);
-  signal register_write_or_read_buf : std_logic; -- 0: read, 1: write
-  signal register_data_buf          : std_logic_vector(31 downto 0);
+	-- register buffer signals, since the information
+	-- should be visible on the LCD more than a clock cycle
+	signal register_addr_buf          : std_logic_vector(11 downto 0);
+	signal register_write_or_read_buf : std_logic; -- 0: read, 1: write
+	signal register_data_buf          : std_logic_vector(31 downto 0);
 
-  -- buffer the register information a while until SREGS is finished
---  constant sregs_buffer_counter_max     : integer := 125000; -- 1ms
---  signal sregs_buffer_counter         : integer range 0 to sregs_buffer_counter_max := 0;
---  signal sregs_buffer_active          : std_logic;
---  signal sregs_buffer_enable          : std_logic;
---  signal sregs_buffer_register_access     : std_logic;
---  signal sregs_buffer_write_or_read     : std_logic;
---  signal sregs_buffer_address         : std_logic_vector(7 downto 0);
---  signal sregs_buffer_write_data        : std_logic_vector(31 downto 0);
-
-   -- SREGS signals
-   signal sregs_clk            : std_logic;
- --  signal sys_mode             : std_logic_vector(15 downto 0);
-   signal sregs_regaddr        : std_logic_vector(12 downto 2);
-   alias regadr                : std_logic_vector(8 downto 0) is sregs_regaddr(10 downto 2);
-
-   signal test_display_int     : std_logic;
-   signal test_display_output  : std_logic;
+	-- SREGS signals
+	signal sregs_clk            : std_logic;
+	--  signal sys_mode             : std_logic_vector(15 downto 0);
+	signal sregs_regaddr        : std_logic_vector(12 downto 2);
+	alias regadr                : std_logic_vector(8 downto 0) is sregs_regaddr(10 downto 2);
 
 	signal DAC_SDI					: std_logic;
 	signal DAC_SCK					: std_logic;
 	signal DAC_CLR					: std_logic;
 	signal DAC_CS_LD				: std_logic;
-	
+
 	signal clk200					: std_logic;
-	signal topix_testp			: std_logic;
+	signal topix_testp				: std_logic;
 	signal topix_eoc				: std_logic;
-	signal topix_data_wait		: std_logic;
+	signal topix_data_wait			: std_logic;
 	signal topix_busy				: std_logic;
 	signal topix_seu_reg			: std_logic;
 	signal topix_seu_fsm			: std_logic;
-	signal topix_serial_in		: std_logic;
-	signal topix_serial_out 	: std_logic;
-	signal topix_serial_en   	: std_logic;	
+	signal topix_serial_in			: std_logic;
+	signal topix_serial_out 		: std_logic;
+	signal topix_serial_en   		: std_logic;	
 	signal topix_cnt_rst			: std_logic;
-	signal topix_data_valid		: std_logic;
-	signal topix_reset			: std_logic;
+	signal topix_data_valid			: std_logic;
+	signal topix_reset				: std_logic;
 	signal topix_sdr_out	 		: std_logic;
-	signal topix_clock	 		: std_logic;	
+	signal topix_clock	 			: std_logic;	
 	signal topix_ddr_out			: std_logic;
 	signal lreset					: std_logic;	
+	signal datacheck_trigger_int	: std_logic;
 
 begin
 
@@ -317,7 +306,6 @@ begin
 	O => FMC_LPC_LA00_CC_P,
 	OB => FMC_LPC_LA00_CC_N
 	);
-	
 	
 	topix_testp <= '0';
 	
@@ -459,7 +447,7 @@ begin
     CLK_IN_N      => CLK_IN_N,
 
     -- Clock out ports
-    CLK_OUT_200   => refclk_bufg,
+    CLK_OUT_200   => refclk_bufg_200,
     CLK_OUT_125   => gtx_clk_bufg, --gtx_clk_bufg,
     CLK_OUT_50    => clk_50,
 
@@ -467,17 +455,6 @@ begin
     RESET         => GLBL_RST,
     LOCKED        => clk_locked
   );
-
-  -- REFCLK_GTX_IBUFDS : IBUFDS_GTXE1
-  -- port map (
-  --   O     => gtx_clk_bufg,
-  --   ODIV2 => open,
-  --   CEB   => '0',
-  --   I     => MGTREFCLK_P,
-  --   IB    => MGTREFCLK_N
-  -- );
-
-
 
   ------------------------------------------------------------------------------
   -- Fan regulator
@@ -493,8 +470,6 @@ begin
     TEMP_ADC_OUT  => temp_adc_int,
     FAN_SPEED_OUT => fan_speed_int
   );
-
-
   ------------------------------------------------------------------------------
   -- LCD control module
   ------------------------------------------------------------------------------
@@ -506,24 +481,20 @@ begin
     MODE          => lcd_mode,
     CONTROL       => lcd_ctrl,  -- LCD_RS, LCD_RW, LCD_E
     SF_D          => lcd_db,    -- LCD data bus
-
     TEMP_IN       => temp_int,
     TEMP_ADC_IN   => temp_adc_int,
     FAN_SPEED_IN  => fan_speed_int,
-
     REGISTER_ADDR           => register_addr_buf,
     REGISTER_WRITE_OR_READ  => register_write_or_read_buf,
     REGISTER_DATA           => register_data_buf,
 
     UDP_PKG_CTR   => udp_pkg_ctr
   );
-
   -- control signals for the lcd
   SF_D <= LCD_DB;
   LCD_E <= LCD_CTRL(0);
   LCD_RW <= LCD_CTRL(1);
   LCD_RS <= LCD_CTRL(2);
-
 
   -- a command for the register came in, display it on the LCD
   display_register_set : process ( gtx_clk_bufg, GLBL_RST, register_access, register_access_ready, register_display_counter_running, register_write_or_read )
@@ -533,7 +504,6 @@ begin
     else
       register_display_counter_enable <= register_display_counter_running or register_access_ready;
     end if;
-
 
     if rising_edge( gtx_clk_bufg ) then
 
@@ -577,7 +547,6 @@ begin
 
   end process;
 
-
   ------------------------------------------------------------------------------
   -- Ethernet wrapper
   ------------------------------------------------------------------------------
@@ -589,7 +558,7 @@ begin
     GLBL_RST      => GLBL_RST,
 
     -- input clocks from generator
-    REFCLK_BUFG   => refclk_bufg,
+    refclk_bufg   => refclk_bufg_200,
     GTX_CLK_BUFG  => gtx_clk_bufg,
     DCM_LOCKED    => clk_locked,
 
@@ -628,139 +597,69 @@ begin
     REGISTER_READ_READY     => register_access_ready,
     REGISTER_WRITE_OR_READ  => register_write_or_read,
     REGISTER_READ_DATA      => register_read_data,
-	 REGISTER_READ_DATA_DMA	 => register_read_data_DMA,
+	REGISTER_READ_DATA_DMA	=> register_read_data_DMA,
     REGISTER_WRITE_DATA     => register_write_data,
     REGISTER_DMA            => register_dma,
     REGISTER_DMA_WAIT       => register_dma_wait,
     REGISTER_DMA_END        => register_dma_end,
     REGISTER_DMA_EMPTY      => register_dma_empty,
     REGISTER_DMA_COUNT      => register_dma_count,
-    REGISTER_CLK            => sregs_clk
+    REGISTER_CLK            => sregs_clk,
+    datacheck_trigger		=> datacheck_trigger_int
 
   );
-
-
-
-
-  ------------------------------------------------------------------------------
-  -- SREGS register control
-  ------------------------------------------------------------------------------
-
---  PULSE_EVERY_1MS : entity work.pulse_every
---  generic map (
---    CLOCK_CYCLES_PER_PULSE  => 50000
---  )
---  port map (
---    CLK   => clk_50,
---    RST   => GLBL_RST,
---    PULSE => pulse_1ms
---  );
---
---  PULSE_EVERY_100MS : entity work.pulse_every
---  generic map (
---    CLOCK_CYCLES_PER_PULSE  => 100
---  )
---  port map (
---    CLK   => pulse_1ms,
---    RST   => GLBL_RST,
---    PULSE => pulse_100ms
---  );
-
-  -- dma_register_read : process ( CLK66 )
-  -- begin
-  --  if rising_edge( CLK66 ) then
-  --    if ( register_addr = x"0400" ) then
-  --      register_dt_ack <= register_access_ready;
-  --    else
-  --      register_dt_ack <= '0';
-  --    end if;
-  --  end if;
-  -- end process;
-
-
   -- get rid of the first and last bits of the address
   -- (equivalent to dividing by 4)
   sregs_regaddr <= register_addr(12 downto 2);
+
+USER_LED_C	<= datacheck_trigger_int;
+  
 
   U_SREGS : entity work.SREGS
   generic map (
     SC_VERSION  => SC_VERSION
   )
   port map (
-    LCLK        => sregs_clk,
-    BASECLOCK   => gtx_clk_bufg,--CLK66,
-    CLK66       => CLK66, -- a direct clock connection is needed for the MMCM
-    CLK200		 => refclk_bufg, 
-	 GRESET      => open,  -- a reset from the SREGS
-   -- P1MS        => pulse_1ms,
-    LED         => USER_LED,
-    USER_SWITCH => USER_SWITCH,
-
-  -- ----------------------- DAC ----------------------------------------- --  
-	DAC_SDI   =>   DAC_SDI,
-	DAC_CLR   =>   DAC_CLR,
-	DAC_SCK   =>   DAC_SCK,
-	DAC_CS_LD =>   DAC_CS_LD,
-  -- -------------------------- local bus to communication port ------------- --
-    P_REG       	=> register_access,
-    P_WR        	=> register_write_or_read,
-    P_A        	=> sregs_regaddr,
-    P_D         	=> register_write_data,
-    P_D_O       	=> register_read_data,
-	 P_D_O_DMA   	=> register_read_data_DMA,
-    P_RDY       	=> register_access_ready,
-    P_BLK       	=> register_dma,
-    P_WAIT     	=> register_dma_wait,
-    P_END       	=> register_dma_end,
-
-  -- ----------------------- ToPix ----------------------------------------- --
-	TOPIX_DATA_WAIT	=>		topix_data_wait,
-	TOPIX_DATA_VALID	=>		topix_data_valid,
-	TOPIX_SDR_OUT		=>		topix_sdr_out,
-	TOPIX_RESET_OUT	=> 	topix_reset,
-
-	 TPX_SDATA_IN	=> topix_serial_in,
-	 TPX_SDATA_EN	=> topix_serial_en,
-	 TPX_SDATA_OUT	=> topix_serial_out,
-	 TPX_CLOCK		=> topix_clock,
-	 
-    --DMD_DMA     	=> sys_mode(0),
-    EV_DATACOUNT  => register_dma_count, --ev_datacount,
-
-  -- -------------------------- direct block transfer ----------------------- --
---    DT_REQ      	=> open, --p_dt_req,
- --   DT_ACK      	=> '0', --register_dt_ack, --p_dt_ack,
---    DT_DEN      	=> open, --p_dt_den,
-    FIFO_EMPTY  	=> register_dma_empty --fifo_empty_i,
-
-  -- -------------------------- write to Host register request -------------- --
- --   HREG_REQ    	=> open, --hreg_req,
- --   HREG_A      	=> open, --hreg_a,
- --   HREG_D      	=> open, --hreg_d,
-  --  HREG_ACK    	=> '0', --hreg_ack,
-
-  -- -------------------------- control/status ------------------------------ --
-   -- SYS_MODE    	=> sys_mode,
-
-  -- -------------------------- host doorbell ------------------------------- --
-   -- P100MS      	=> pulse_100ms,
-  --  DMD_WR      	=> '0' --p_dt_den
+	LCLK        		=> sregs_clk,
+	BASECLOCK   		=> gtx_clk_bufg,--CLK66,
+	CLK66       		=> CLK66, -- a direct clock connection is needed for the MMCM
+	CLK200				=> refclk_bufg_200, 
+	RESET_IN 			=> GLBL_RST,
+	GRESET      		=> open,  -- a reset from the SREGS
+	LED         		=> USER_LED,
+	USER_SWITCH 		=> USER_SWITCH,
+	-- ----------------------- DAC ----------------------------------------- --  
+	DAC_SDI   			=>   DAC_SDI,
+	DAC_CLR   			=>   DAC_CLR,
+	DAC_SCK   			=>   DAC_SCK,
+	DAC_CS_LD 			=>   DAC_CS_LD,
+	-- -------------------------- local bus to communication port ------------- --
+	P_REG       		=> register_access,
+	P_WR        		=> register_write_or_read,
+	P_A        			=> sregs_regaddr,
+	P_D         		=> register_write_data,
+	P_D_O       		=> register_read_data,
+	P_D_O_DMA   		=> register_read_data_DMA,
+	P_RDY       		=> register_access_ready,
+	P_BLK       		=> register_dma,
+	P_WAIT     			=> register_dma_wait,
+	P_END       		=> register_dma_end,
+	-- ----------------------- ToPix ----------------------------------------- --
+	TOPIX_DATA_WAIT		=> topix_data_wait,
+	TOPIX_DATA_VALID	=> topix_data_valid,
+	TOPIX_SDR_OUT		=> topix_sdr_out,
+	TOPIX_RESET_OUT		=> topix_reset,			--! Reset signal for topix
+	TPX_SDATA_IN		=> topix_serial_in,		--! Serial data from topix
+	TPX_SDATA_EN		=> topix_serial_en,		--! Serial data enable signal to topix
+	TPX_SDATA_OUT		=> topix_serial_out,	--! Serial data to topix
+	TPX_CLOCK			=> topix_clock,			--! Clock signal for ToPoix
+	TPX_EOC_IN			=> topix_eoc,			--! ToPix timestamp overflow signal (end-of-counting)
+	TPX_SEU_FSM_IN		=> topix_seu_fsm,
+	TPX_SEU_REG_IN		=> topix_seu_reg,
+	TPX_BUSY_IN			=> topix_busy,
+	TPX_DDR_OUT_IN		=> topix_ddr_out,
+	EV_DATACOUNT  		=> register_dma_count, 	--ev_datacount,
+	FIFO_EMPTY  		=> register_dma_empty 	--fifo_empty_i,
   );
 
---  test_display_int <= (register_access and register_write_or_read) and
---                B2SL(regadr = std_logic_vector(to_unsigned(LED_REG, regadr'length)) );
-
---  Test_Display : entity work.led_eine_sec
---  port map (
---    CLK       => gtx_clk_bufg,
---    TRIGGER   => test_display_int,
---    LED_TEST  => open,
---    LED_OUT   => test_display_output
---  );
-
-  --USER_LED(0) <= test_display_output;
-  --USER_LED(7 downto 1) <= (others => '0');
-
-
 end Behavioral;
-

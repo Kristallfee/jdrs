@@ -1,19 +1,22 @@
 #include "topix4_fairmq_readout.h"
 
-//#ifndef Q_MOC_RUN  // workaround for issue with boost and qt < Qt5
-//#include <boost/thread.hpp>
-//#include <boost/bind.hpp>
+#include "boost/thread.hpp"
+#include "boost/bind.hpp"
+#include "helper_functions.h"
 //#endif
 
 //#include "FairMQLogger.h"
 
 
-ToPix4_FairMQ_Readout::ToPix4_FairMQ_Readout()
+ToPix4_FairMQ_Readout::ToPix4_FairMQ_Readout() :
+    CmdWordOld(0),previous_le_dataword(0), previous_te_dataword(0)
 {
 }
 
 ToPix4_FairMQ_Readout::~ToPix4_FairMQ_Readout()
 {
+
+
 }
 
 void ToPix4_FairMQ_Readout::Init()
@@ -43,47 +46,35 @@ int ToPix4_FairMQ_Readout::CloseASICConnection()
 
 void ToPix4_FairMQ_Readout::Run()
 {
-   // LOG(INFO) << ">>>>>>> Run <<<<<<<";
+  //  LOG(INFO) << ">>>>>>> Run <<<<<<<";
 
-  //  boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
+    boost::thread rateLogger(boost::bind(&FairMQDevice::LogSocketRates, this));
   //  boost::thread resetEventCounter(boost::bind(&O2FLPex::ResetEventCounter, this));
 
     TMrfData_8b tempdaten;
     FairMQMessage* msg;
 
     while ( fState == RUNNING ) {
-
         _topix4control.readOutputBuffer(tempdaten,fEventSize*5);
-        std::cout << "get no of words: " <<  tempdaten.getNumWords() << std::endl;  // a word is a 8 bit unit
-        std::cout << "get no of data words: " <<  tempdaten.getNumWords()/5 << std::endl; // one data word is made of 5 words (=40 bit)
-        std::cout << "no of bits : " <<  tempdaten.getNumWords()*8 << std::endl;
 
-       /* FairMQMessage* msg = fTransportFactory->CreateMessage(500);  // reserve space in byte
-        for (int i=0; i<tempdaten.getNumWords() ; i+=500)  // send per fairmq message 100 data words
-        {
-            memcpy(msg->GetData(),reinterpret_cast<u_int8_t*>(&tempdaten.regdata[i]), tempdaten.getNumWords()*500);
+        Counter_Compare(tempdaten, CmdWordOld, previous_le_dataword, previous_te_dataword);
 
-        }
-        */
+        msg = fTransportFactory->CreateMessage(tempdaten.getNumWords());
+        memcpy(msg->GetData(),reinterpret_cast<u_int8_t*>(&tempdaten.regdata[0]), tempdaten.getNumWords());
 
+       // LOG(INFO) << "Number of bytes " <<  tempdaten.getNumWords() << " Number of Data Words " <<   tempdaten.getNumWords()/8;
 
-        msg = fTransportFactory->CreateMessage(tempdaten.getNumWords()*5);
-        memcpy(msg->GetData(),reinterpret_cast<u_int8_t*>(&tempdaten.regdata[0]), tempdaten.getNumWords()*5);
-
-        std::cout << "copy of data done" << std::endl;
-
-        if(tempdaten.getNumWords()!=0){
+        if(tempdaten.getNumWords()-5!=0){
         fPayloadOutputs->at(0)->Send(msg);
-
         }
+
 
         delete msg;
     }
- //   rateLogger.interrupt();
-//    resetEventCounter.interrupt();
 
- //   rateLogger.join();
- //   resetEventCounter.join();
+    rateLogger.interrupt();
+    rateLogger.join();
+    //resetEventCounter.join();
 
 }
 

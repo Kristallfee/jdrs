@@ -165,7 +165,7 @@ class TMrfTal_RBUDP : virtual public TMrfTal, virtual public TMrfGal_Udp
 
         //! Executes DMA readout.
         //const int doReadout(TMrfData& data, const u_int32_t& wordcount, u_int8_t* const startaddress);
-        int doReadout(const u_int32_t& wordcount, u_int8_t* const startaddress) const;
+        int doReadout(const u_int32_t& wordcount, u_int8_t* const startaddress) const ;
 
 
 

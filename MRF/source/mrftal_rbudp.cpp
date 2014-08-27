@@ -222,7 +222,7 @@ int TMrfTal_RBUDP::doReadout(const u_int32_t& wordcount, u_int8_t* const startad
         if ( *(u_int32_t*)(req.memoryAddress) == 0xeeeeeeee && req.wordcount == 1 )
            { req.wordcount = 0;}
 
-        std::cout << "doReadout::return::wordcount " << req.wordcount << std::endl;
+       // std::cout << "doReadout::return::wordcount " << req.wordcount << std::endl;
 
         return req.wordcount;
     } else {
