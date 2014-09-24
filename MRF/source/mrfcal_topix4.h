@@ -21,6 +21,7 @@ public:
     virtual void readCCR1(TMrfData_Topix4Config& data) const;
     virtual void readCCR2(TMrfData_Topix4Config& data) const;
     virtual void setConfigMode();
+    virtual void injectchargesync(int delay, int wait) const;
 
 private:
     TMrfData_ToPix4Command _command;
