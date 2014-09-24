@@ -16,6 +16,7 @@ public:
 
     topix4_fairmq_receiver();
     virtual ~topix4_fairmq_receiver();
+    void SetBigCounter(string value);
    // void Log(int intervalInMs);
 protected:
     virtual void Run();
@@ -25,11 +26,13 @@ protected:
     int fEventCounter;
 
 private:
-    WriteToFile writetofile;
+    WriteToFile* writetofile;
 
-    u_int64_t CmdWordOld;
-    u_int64_t previous_le_dataword;
-    u_int64_t previous_te_dataword;
+    u_int64_t previous_comandoword;
+    //u_int64_t previous_le_dataword;
+    //u_int64_t previous_te_dataword;
+    u_int64_t previous_dataword;
+    bool bigcounter;
 
 };
 

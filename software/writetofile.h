@@ -19,6 +19,7 @@ public:
     bool OpenFile();
     bool OpenFile(int mark);
     bool Close();
+    bool isDataFileOpen();
     void ConfigHeader(QString);
     void AppendToConfig(QString data);
     void AppendToConfig(int data);

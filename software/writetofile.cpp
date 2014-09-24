@@ -14,25 +14,28 @@ WriteToFile::WriteToFile():i(1),filesize(200000000)
 
 u_int32_t WriteToFile::graytobin(u_int32_t gray)
 {
-        u_int32_t result = 0;
-        setIntBit(31, result, getIntBit(31, gray));
-        for (unsigned int i = 30; i > 0; --i) {
-                setIntBit(i, result, (getIntBit(i+1, result) && !(getIntBit(i, gray))) || (!(getIntBit(i+1, result)) && getIntBit(i, gray)));
-        }
-        setIntBit(0, result, (getIntBit(1, result) && !(getIntBit(0, gray))) || (!(getIntBit(1, result)) && getIntBit(0, gray)));
-        return result;
+    u_int32_t result = 0;
+    setIntBit(31, result, getIntBit(31, gray));
+    for (unsigned int i = 30; i > 0; --i) {
+        setIntBit(i, result, (getIntBit(i+1, result) && !(getIntBit(i, gray))) || (!(getIntBit(i+1, result)) && getIntBit(i, gray)));
+    }
+    setIntBit(0, result, (getIntBit(1, result) && !(getIntBit(0, gray))) || (!(getIntBit(1, result)) && getIntBit(0, gray)));
+    return result;
 }
 
 QString WriteToFile::GetDataFileName()
 {
-return filename;
+    return filename;
+}
 
+bool WriteToFile::isDataFileOpen()
+{
+    return datafile.isOpen();
 }
 
 QString WriteToFile::GetPathName()
 {
-return pathname;
-
+    return pathname;
 }
 
 void WriteToFile::SetPathName(QString path)
@@ -45,31 +48,24 @@ bool WriteToFile::OpenFile(int mark)
     i=1;
     time (&_timeStamp);
     nun = localtime(&_timeStamp);
-
     filename.clear();
     filename.append(pathname);
     if(!filename.endsWith("/"))
     {
         filename.append("/");
     }
-    //filename.clear();
-    //filename.append("/daten1/");
+
     filename.append(QString("%1").arg(nun->tm_year+1900,4,10,QChar('0')));
     filename.append("-");
     filename.append(QString("%1").arg(nun->tm_mon+1,2,10,QChar('0')));
-   // filename.append(QString::number(nun->tm_mon+1));
     filename.append("-");
     filename.append(QString("%1").arg(nun->tm_mday,2,10,QChar('0')));
-   // filename.append(QString::number(nun->tm_mday));
     filename.append("-");
     filename.append(QString("%1").arg(nun->tm_hour,2,10,QChar('0')));
-   // filename.append(QString::number(nun->tm_hour));
     filename.append("-");
     filename.append(QString("%1").arg(nun->tm_min,2,10,QChar('0')));
-   // filename.append(QString::number(nun->tm_min));
     filename.append("-");
     filename.append(QString("%1").arg(nun->tm_sec,2,10,QChar('0')));
-   // filename.append(QString::number(nun->tm_sec));
 
     filename_datastream.clear();
     filename_configstream.clear();
@@ -81,22 +77,16 @@ bool WriteToFile::OpenFile(int mark)
     filename_configstream.append(QString::number(mark));
     filename_datastream.append("-data--0.txt");
     filename_configstream.append("-config.txt");
-
-    //configstream.open(filename_configstream.toStdString().c_str(), std::ios::out|std::ios::app);
-    //datastream.open(filename_datastream.toStdString().c_str(),std::ios::out|std::ios::app);
     configfile.setFileName(filename_configstream);
     datafile.setFileName(filename_datastream);
     if (!configfile.open(QIODevice::WriteOnly|QIODevice::Append))
     {
-       // std::cout << "blubb" << std::endl;
-
-        //std::cout << configfile.error() << std::endl;
-
+        std::cout << "ERROR: Could not open configfile " << std::endl;
         return false;
     }
     if(!datafile.open(QIODevice::WriteOnly|QIODevice::Append))
     {
-          //  std::cout << "blubb2" << std::endl;
+        std::cout << "ERROR: Could not open datafile " << std::endl;
         return false;
     }
 
@@ -108,7 +98,7 @@ bool WriteToFile::OpenFile(int mark)
 
 bool WriteToFile::OpenFile()
 {
-    OpenFile(0);
+    return OpenFile(0);
 }
 
 void WriteToFile::ConfigHeader(QString type)

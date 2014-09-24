@@ -44,9 +44,9 @@ static void s_catch_signals (void)
 
 int main(int argc, char** argv)
 {
-    if ( argc != 7 ) {
+    if ( argc != 8 ) {
         cout << "Usage: run_topix4_fairmq_receiver \tID numIoTreads\n"
-                  << "\t\tinputSocketType inputRcvBufSize inputMethod inputAddress\n"
+                  << "\t\tinputSocketType inputRcvBufSize inputMethod inputAddress bigcounter\n"
                   << endl;
         return 1;
     }
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
      ++i;
      topix4_receiver.SetProperty(topix4_fairmq_receiver::InputAddress, argv[i], 0);
      ++i;
-
+     topix4_receiver.SetBigCounter(argv[i]);
 
      topix4_receiver.ChangeState(topix4_fairmq_receiver::SETOUTPUT);
      topix4_receiver.ChangeState(topix4_fairmq_receiver::SETINPUT);
