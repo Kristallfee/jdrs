@@ -29,7 +29,7 @@ private:
     TH1F* trailing_Edge;
     TH2F* pixel_position;
 
-    int blubb;
+    int counter;
 
 };
 

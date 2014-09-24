@@ -30,6 +30,8 @@ void DataMonitor::Init()
     pixel_position = new TH2F("PixelPosition","PixelPosition",32,-0.5,31.5,20,-0.5,19.5);
     pixel_position->Draw();
 
+    counter=0;
+
 }
 
 void DataMonitor::Run()
@@ -41,14 +43,13 @@ void DataMonitor::Run()
     TMrfData_8b tempdaten;
 
     u_int64_t dataword=0;
-    long int previous_le_dataword=0;
-    long int previous_te_dataword=0;
 
     long int le_dataword=0;
     long int te_dataword=0;
 
     while( fState == RUNNING)
     {
+
         FairMQMessage* msg = fTransportFactory->CreateMessage();
         fPayloadInputs->at(0)->Receive(msg);
         int inputSize = msg->GetSize();
@@ -56,7 +57,7 @@ void DataMonitor::Run()
 
         memcpy(reinterpret_cast<u_int8_t*>(&tempdaten.regdata[0]),msg->GetData(), msg->GetSize());
 
-        for(u_int i=0 ;i< tempdaten.getNumWords(); i+=5 )
+        for(u_int i=5 ;i< tempdaten.getNumWords(); i+=5 )
         {
             dataword=0;
 
@@ -73,82 +74,21 @@ void DataMonitor::Run()
             leading_Edge->Fill(le_dataword);
             trailing_Edge->Fill(te_dataword);
 
-
-            if (le_dataword!=te_dataword)
-            {
-                LOG(INFO) << "LE != TE. dataword: " << i/5 ;
-                LOG(INFO) << "LE " <<  le_dataword;
-                LOG(INFO) << "TE " << te_dataword ;
-            }
-
-            if (le_dataword!= previous_le_dataword+1 || te_dataword!= previous_te_dataword+1)
-            {
-                if(previous_le_dataword==4095 && le_dataword==0)
-                {
-                    previous_le_dataword = le_dataword;
-                    previous_te_dataword = te_dataword;
-                    continue;
-                }
-
-                LOG(INFO) << "=====ERROR IM COUNTER. dataword: " << i/5 ;
-                LOG(INFO) << "previous LE " << previous_le_dataword << " now LE "  << le_dataword ;
-                LOG(INFO) << "previous TE "  << previous_te_dataword << " now TE " << te_dataword;
-
-                LOG(INFO) << "NumberOfWords "  << tempdaten.getNumWords();
-
-                std::cout << std::setfill('0') << std::setw(2);
-
-                if(i>9)
-                {
-                    std::cout << std::setfill('0') << std::setw(2)<< std::hex <<  (u_int16_t)(tempdaten.getWord(i-10))<< (u_int16_t)(tempdaten.getWord(i-9))<< (u_int16_t)(tempdaten.getWord(i-8)) << (u_int16_t)(tempdaten.getWord(i-7))<<  (u_int16_t)(tempdaten.getWord(i-6))  << std::endl;
-                }
-                else
-                {
-                    std::cout << "First Dataword in package" << std::endl;
-                }
-
-                if(i>4)
-                {
-                    std::cout << std::setfill('0') << std::setw(2)<< std::hex <<  (u_int16_t)(tempdaten.getWord(i-5))<< (u_int16_t)(tempdaten.getWord(i-4))<< (u_int16_t)(tempdaten.getWord(i-3)) << (u_int16_t)(tempdaten.getWord(i-2))<<  (u_int16_t)(tempdaten.getWord(i-1))  << std::endl;
-                }
-                else
-                {
-                    std::cout << "First Dataword in package" << std::endl;
-                }
-
-                std::cout << std::hex << "dataword " <<  dataword << std::endl;
-                if(i< tempdaten.getNumWords()-9 && tempdaten.getNumWords()>9 )
-                {
-                    std::cout<< std::setfill('0') << std::setw(2) << std::hex <<  static_cast<int>(tempdaten.getWord(i+5))<< static_cast<int>(tempdaten.getWord(i+6))<< static_cast<int>(tempdaten.getWord(i+7)) << static_cast<int>(tempdaten.getWord(i+8))<<  static_cast<int>(tempdaten.getWord(i+9))  << std::endl;
-                }
-                else
-                {
-                    std::cout << "Last Dataword in package" << std::endl;
-                }
-
-                if(i< tempdaten.getNumWords()-14 && tempdaten.getNumWords()>14 )
-                {
-                    std::cout << std::setfill('0') << std::setw(2)<< std::hex <<  static_cast<int>(tempdaten.getWord(i+10))<< static_cast<int>(tempdaten.getWord(i+11))<< static_cast<int>(tempdaten.getWord(i+12)) << static_cast<int>(tempdaten.getWord(i+13))<<  static_cast<int>(tempdaten.getWord(i+14))  << std::endl;
-                }
-                else
-                {
-                    std::cout << "Last Dataword in package" << std::endl;
-                }
-                LOG(INFO) << "=====" << te_dataword;
-
-            }
-            previous_le_dataword = le_dataword;
-            previous_te_dataword = te_dataword;
         }
 
-        canvas->cd(0);
-        gPad->Modified();
+        if(counter == 100)
+        {
+          //  canvas->cd(1);
+          //  gPad->Modified();
 
-        canvas->cd(1);
-        gPad->Modified();
+          //  canvas->cd(2);
+            gPad->Modified();
 
-        canvas->Update();
+            canvas->Update();
 
+            counter=0;
+        }
+            counter++;
         delete msg;
     }
 
