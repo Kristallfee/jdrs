@@ -10,8 +10,8 @@ void TMrfData_ToPix4Command::initMaps()
 {
     _localdata.clear();
     _localdata["Data"]                      = TConfItem(0, 0,12);
-    _localdata["OperationCode"]             = TConfItem(0,12, 5);
-    _localdata["Padding"]                   = TConfItem(0,17,15);
+    _localdata["OperationCode"]             = TConfItem(0,12, 6);
+    _localdata["Padding"]                   = TConfItem(0,18,14);
 
     _datastreamlength = 0;
     std::map<std::string, TConfItem>::const_iterator iter;
@@ -38,5 +38,5 @@ void TMrfData_ToPix4Command::setOperationCode(u_int32_t operationcode)
 
 void TMrfData_ToPix4Command::setData(u_int32_t data)
 {
-    _localdata.find("OperationCode")->second.value = data;
+    _localdata.find("Data")->second.value = data;
 }
