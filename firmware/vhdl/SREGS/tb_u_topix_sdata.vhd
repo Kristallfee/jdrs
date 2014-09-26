@@ -3,10 +3,10 @@
  use work.util_pack.all;
  use work.sample_package.all;
  
- entity Testbench is
- end Testbench;
+ entity Test is
+ end Test;
  
- architecture topix_sdata of Testbench is
+ architecture Testbench of Test is
 	 signal clock_topix_150mhz      : std_logic;
 	 signal clock_register_66mhz    : std_logic;
 	 signal ilreset                 : std_logic := '0';
@@ -62,7 +62,7 @@
 		module_register_rd_en <= '0';
 		wait for 16 ns;
 
-	 end read_from_module;
+	end read_from_module;
 	 
 	 procedure write_to_module
 			(
@@ -80,7 +80,7 @@
 				 wait for 16 ns;
 				 register_module_wr_en <= '0';
 				 wait for 16 ns;
-	 end write_to_module;
+			 end write_to_module;
 			 
 		begin
 			
@@ -128,4 +128,4 @@
 	 );
 	 
 	 
- end topix_sdata;
+ end Testbench;
