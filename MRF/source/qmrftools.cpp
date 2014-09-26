@@ -120,7 +120,7 @@ void qmrftools::clearItemTable(TMrfDataAdv3DMatrix& data, QTableWidget& table, i
 void qmrftools::fillItemTable(const TMrfDataAdv3DMatrix &data, QTableWidget &table, int column)
 {
     std::map<const std::string, TConfItem>::const_iterator iter;
-    for(unsigned int row=0; row < data.getRowCount(column); row++)
+    for(int row=0; row < data.getRowCount(column); row++)
     {
         int i=0;
         for(iter = data.getConstItemIteratorBegin(column,row);iter!= data.getConstItemIteratorEnd(column,row);iter++)
