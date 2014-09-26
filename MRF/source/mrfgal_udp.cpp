@@ -190,10 +190,7 @@ int TMrfGal_Udp::doIoctl(const int &requestType, void *arg) const
     for(u_int j = 0; words > j*294 && ((CmdWord & 0xff00000000) != udpDataFlag::DMA_last_reply); j++){
 
         u_int32_t wordsread_temp = 0;
-  //      if ( _readBuffer(req->memoryAddress + (wordsread), (req->wordcount)+5, CmdWord, &wordsread_temp) != 0 ) {
-        if ( _readBuffer(req->memoryAddress + (wordsread), (req->wordcount), CmdWord, &wordsread_temp) != 0 ) {
-          //  u_int32_t *returnSingleBlock;
-          //  returnSingleBlock = (u_int32_t*)(req->memoryAddress + (wordsread ) - 5); //show last word
+        if ( _readBuffer(req->memoryAddress + (wordsread), (req->wordcount)+5, CmdWord, &wordsread_temp) != 0 ) {
             break;
         }
 
@@ -512,7 +509,7 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
             std::cout << out << std::endl;
         }
 
-        for ( unsigned int i = 0; i < length && i < nBytesRecv; i++ ) {
+        for ( unsigned int i = 0; i < length+1 && i < nBytesRecv; i++ ) {
         //    for ( unsigned int i = 5; i < length && i < nBytesRecv; i++ ) {
             recvSingleBlock = (u_int8_t*)(&recv[i]);
            // returnSingleBlock = (u_int8_t*)(dataStartAddress+i-5); //change StartAddress or previous data is overwritten
@@ -522,7 +519,9 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
 
             if ( _verbose ) {
                 sprintf( out, "word %d:  ", i );
-                byte = (unsigned char*)(recvSingleBlock);
+        //        byte = (unsigned char*)(recvSingleBlock);
+                byte = (unsigned char*)(returnSingleBlock);
+
                 sprintf( out, "%s %02x", out, *(byte) );
                 std::cout << out << std::endl;
             }
