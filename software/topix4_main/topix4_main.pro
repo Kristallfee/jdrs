@@ -12,6 +12,9 @@ TARGET = topix4_main
 
 INCLUDEPATH += ../../MRF/source/ /home/ikp1/esch/fairsoft/FairRoot_Mohammad_build/include/ /private/esch/external_packages/FairSoft_build/include/
 
+
+DEPENDPATH += ../helper_functions.h
+
 #CONFIG -= qt
 
 TEMPLATE = app
@@ -21,6 +24,7 @@ RESOURCES += \
 SOURCES += main.cpp\
 	mainwindow.cpp \
 	topix4_fairmq_readout.cpp \
+	 ../writetofile.cpp \
 	 ../../MRF/source/mrfdata_chain2ltc2604.cpp \
 	 ../../MRF/source/mrfdata_chainltc.cpp \
 	 ../../MRF/source/mrfdataadv2d.cpp \
@@ -56,9 +60,12 @@ SOURCES += main.cpp\
 	 ../../MRF/source/mrfdata_afei3hits.cpp \
 	 ../../MRF/source/mrfdata_afei3.cpp \
 	 ../../MRF/source/stringseparator.cpp \
+    ../../MRF/source/mrfdata_tpx4pixel.cpp \
+    ../../MRF/source/mrfdata_tpx4data.cpp
 
 HEADERS  += mainwindow.h \
 	 topix4_fairmq_readout.h \
+	 ../writetofile.h \
 	 ../../MRF/source/mrfdata_chain2ltc2604.h \
 	 ../../MRF/source/mrfdata_chainltc.h \
 	 ../../MRF/source/mrfdataadv2d.h \
@@ -94,7 +101,9 @@ HEADERS  += mainwindow.h \
 	 ../../MRF/source/mrfdata_afei3hits.h \
 	 ../../MRF/source/mrfdata_afei3.h \
 	 ../../MRF/source/stringseparator.h \
-    helper_functions.h
+    ../helper_functions.h \
+    ../../MRF/source/mrfdata_tpx4pixel.h \
+    ../../MRF/source/mrfdata_tpx4data.h
 
 
 QMAKE_MOC = $$QMAKE_MOC -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
