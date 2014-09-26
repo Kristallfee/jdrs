@@ -5,21 +5,21 @@
 #include <stdint.h>
 
 namespace topix4_command {
-        static const u_int32_t storedataccr0 = 0;
-        static const u_int32_t readdataccr0 = 1;
-        static const u_int32_t storedataccr1 = 2;
-        static const u_int32_t readdataccr1 = 3;
-        static const u_int32_t storedataccr2 = 4;
-        static const u_int32_t readdataccr2 = 5;
-        static const u_int32_t writepixelconfigeven = 8;
-        static const u_int32_t writepixelconfigodd = 9;
-        static const u_int32_t readpixelconfigeven = 10;
-        static const u_int32_t readpixelconfigodd = 11;
-        static const u_int32_t movetonextpixeleven = 12;
-        static const u_int32_t movetonextpixelodd = 13;
-        static const u_int32_t normaloperation = 14;
-        static const u_int32_t configmodeoperation = 15;
-        static const u_int32_t nooperation = 31;
+        static const u_int32_t nooperation = 0;
+        static const u_int32_t normaloperation = 1;
+        static const u_int32_t configmodeoperation = 2;
+        static const u_int32_t columnselection = 3;
+        static const u_int32_t writepixelconfiguration = 4;
+        static const u_int32_t readpixelconfiguration = 5;
+        static const u_int32_t movetonextpixel = 7;
+        static const u_int32_t storedataccr0 = 32;
+        static const u_int32_t readdataccr0 = 48;
+        static const u_int32_t storedataccr1 = 33;
+        static const u_int32_t readdataccr1 = 49;
+        static const u_int32_t storedataccr2 = 34;
+        static const u_int32_t readdataccr2 = 50;
+        static const u_int32_t storedataccr3 = 35;
+        static const u_int32_t readdataccr3 = 51;
 }
 
 namespace topix4_ccrnumber {
@@ -38,6 +38,7 @@ public:
       virtual void assemble();
 
       virtual void setCommand(std::string ccr, u_int32_t command);
+
       uint32_t getCounterMode();
 
 };
