@@ -79,6 +79,7 @@ port (
 	TOPIX_DATA_VALID	: in  std_logic;
 	TOPIX_SDR_OUT		: in  std_logic;
 	TOPIX_RESET_OUT		: out std_logic;
+	TPX_TESTP_OUT			: out std_logic;
 	TPX_SDATA_IN		: out std_logic;
 	TPX_SDATA_EN		: out std_logic;
 	TPX_SDATA_OUT		: in  std_logic;
@@ -90,7 +91,7 @@ port (
 	TPX_DDR_OUT_IN		: in  STD_LOGIC;
 
 --	-------------------------- control signals ---------------------------- --
-	EV_DATACOUNT		: out std_logic_vector(17 downto 0);
+	EV_DATACOUNT		: out std_logic_vector(31 downto 0);
 	FIFO_EMPTY  		: out std_logic
 );
 end SREGS;
@@ -127,7 +128,7 @@ architecture RTL of SREGS is
 	signal fi_ren									: std_logic;
 	signal fi_empty,fi_full							: std_logic;
 	signal fi_pfull									: std_logic;		-- 3/4
-	signal fi_datacount								: std_logic_vector(17 downto 0);
+	signal fi_datacount								: std_logic_vector(31 downto 0);
 	signal fi_din_dummy								: std_logic_vector(31 downto 0);
 	signal fi_din,fi_dout         					: std_logic_vector(39 downto 0);
 	signal fi_valid									: std_logic;
@@ -136,13 +137,14 @@ architecture RTL of SREGS is
 	signal blk_rdy									: std_logic;
 	signal blk_cnt									: std_logic_vector(17 downto 0);	-- lword count, 1MB
 	signal blk_zero									: std_logic;	-- zero
-	signal ev_datacount_int		   					: std_logic_vector(17 downto 0);
+	signal ev_datacount_int		   					: std_logic_vector(31 downto 0);
 -- ========================== Clocks ====================================== --	
 	signal clk10mhz									: std_logic;
 
 -- ========================== ToPix  ====================================== --	
 	signal tpx_busy 								: std_logic;
 	signal tpx_eoc 									: std_logic;
+	signal topixslowreg							: std_logic_vector(31 downto 0);
 
 
 -- ==========================  Misc  ====================================== --
@@ -178,7 +180,8 @@ architecture RTL of SREGS is
 	
 	signal fifo_reset 								: std_logic;
 	signal topixclock_reset							: std_logic;
-
+	signal topix_data_wait_int						: std_logic;
+	
 -- ======================================================================= --
 --										       Begin                                 --
 -- ======================================================================= --
@@ -209,9 +212,12 @@ U_FAKE_DATA_GENERATOR: entity work.fake_data_generator PORT MAP(
 	SINGLE_SHOT_IN 			=> creg_sync_topixclk(11),
 	NUMBER_SINGLE_SHOT_IN 	=> fake_data_generator_single_shot_number,
 	INTERVAL_IN 			=> fake_data_generator_interval,
+	STOP_FIFO_FULL_IN		=> creg_sync_topixclk(12),
+    FAKE_DATA_FIFO_FULL_IN 	=> fi_full,
 	FAKE_DATA_OUT 			=> fake_data_generator_data,
 	FAKE_DATA_WR_EN_OUT 	=> fake_data_generator_wr_en
 );
+
 
 
 
@@ -225,6 +231,10 @@ fi_wen <= 	topix_fifo_data_wr_en 				when choose_datapath(1 downto 0) ="00" else
 				tpx_fifodummydestwe			 	when choose_datapath(1 downto 0) ="10" else
 				fake_data_generator_wr_en		when choose_datapath(1 downto 0) ="11" else
 				topix_fifo_data_wr_en;
+
+
+
+
 
 ToPix_sdata: entity work.u_topix_sdata 
 PORT MAP(
@@ -287,7 +297,9 @@ port map (
 );
 
 
+TPX_TESTP_OUT <= topixslowreg(1);
 
+TOPIX_DATA_WAIT <= topix_data_wait_int or not topixslowreg(0);
 
 rc_we		<= P_REG and P_WR and B2SL(regadr(regadr'high downto 5) = (SM_DRP/32));
 rc_start	<= P_REG and P_WR and B2SL(regadr = (SM_DRP+31));
@@ -325,7 +337,7 @@ dma_buffer : entity work.daq_fifo
     	dout 			=> fi_dout,
     	full 			=> fi_full,
     	empty 			=> fi_empty,
-    	rd_data_count 	=> fi_datacount,
+    	rd_data_count 	=> fi_datacount(17 downto 0),
    		prog_full 		=> fi_pfull
     );	
 
@@ -337,7 +349,7 @@ ToPix_data: entity work.u_topix_data
 		TPX_SDR_OUT 			=> TOPIX_SDR_OUT,
 		MODULE_FIFO_DATA 		=> topix_fifo_data,
 		TPX_DATA_VALID 			=> TOPIX_DATA_VALID,
-		TPX_DATA_WAIT 			=> TOPIX_DATA_WAIT,
+		TPX_DATA_WAIT 			=> topix_data_wait_int,
 		MODULE_FIFO_DATA_WR_EN 	=> topix_fifo_data_wr_en
 	);
 
@@ -375,7 +387,9 @@ with led_config select LED <=
 	ev_datacount_int(17 downto 16)&"011100"		when "00101",		-- 5
 	module_register_data_count_int(7 downto 0)	when "00110",		-- 6
 	register_module_data_count_int(7 downto 0)	when "00111",		-- 7
-	tpx_busy & tpx_eoc &"000000"				when "01000",		-- 8
+	tpx_busy & tpx_eoc & creg(1) & "00000"				when "01000",		-- 8
+	ltc_fifo_datacount(7 downto 0) 			when "01001", 
+
 	"11111111" 									when others;
 
 -- ======================================================================= --
@@ -412,6 +426,10 @@ begin
 			led_config <= P_D(led_config'range);
 		end if;
 		
+		if SL2B(P_REG and P_WR) and (regadr = TPX_SLOW_CTRL) then
+			topixslowreg <= P_D(topixslowreg'range);
+		end if;
+		
 		if SL2B(P_REG and P_WR) and (regadr = CHOOSE_DATA_PATH) then
 			choose_datapath <= P_D(choose_datapath'range);
 		end if;
@@ -423,10 +441,16 @@ begin
 		if SL2B(P_REG and P_WR) and (regadr = TPX_SDATA_INPUT_REG) then
 			register_module_data_int			<= P_D(register_module_data_int'range);
 			register_module_data_wr_en_int	<= '1';
+		else 
+			register_module_data_wr_en_int	<= '0';
 		end if;
 		if dummy_data_busy ='1' then   -- start dummy data transfer from sm to data fifo
 			creg(4) <='0';
 		end if;
+		if ltcconfbusy ='1' then   -- if ltc sm is started reset start signal 
+			creg(14) <='0';
+		end if;
+
 		if drp_busy ='1'  then
 			creg(5)	<= '0';        --start Clockgen Reconfigure
 		end if;
@@ -594,8 +618,12 @@ P_D_O <=
 			 and EXT2SLV(ev_datacount_int))
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = CHOOSE_DATA_PATH))
 			 and choose_datapath)
+		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = TPX_SLOW_CTRL))
+			 and topixslowreg)			 
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = FAKE_DATA_INTERVAL))
 			 and fake_data_generator_interval)
+		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = TPX_INPUTCOUNT_REG))
+			 and EXT2SLV(tpx_inputsm_serial_data_length))	 
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = GLS_CONTROL_REGISTER))
 			 and creg)
 		or (    SL2SLV(P_REG and not P_WR and B2SL(regadr = FAKE_DATA_GENERATOR_SINGLE_SHOT_NUMBER))
