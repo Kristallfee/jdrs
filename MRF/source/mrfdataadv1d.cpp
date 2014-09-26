@@ -118,9 +118,14 @@ void TMrfDataAdv1D::disassemble()
 
 }
 
+void TMrfDataAdv1D::flushData()
+{
+    _localdata.clear();
+}
+
 int TMrfDataAdv1D::getItemCount() const
 {
-	return _localdata.size();
+        return _localdata.size();
 }
 
 TMrfDataAdv1D::constItemIterator TMrfDataAdv1D::getConstItemIteratorBegin() const

@@ -46,6 +46,7 @@ class TMrfDataAdv1D : virtual public TMrfDataAdvBase
 		virtual void disassemble();
 		
 		virtual int getItemCount() const;
+		virtual void flushData();
 
 		virtual constItemIterator getConstItemIteratorBegin() const;
 		virtual constItemIterator getConstItemIteratorEnd() const;
