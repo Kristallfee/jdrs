@@ -12,7 +12,7 @@
 topix4_fairmq_receiver::topix4_fairmq_receiver():
     fEventSize(10000),
     fEventRate(1),
-    fEventCounter(0),previous_dataword(0), previous_comandoword(0), bigcounter(false)
+    fEventCounter(0), previous_comandoword(0), previous_dataword(0), bigcounter(false)
 {
     writetofile = new WriteToFile();
 }
@@ -54,9 +54,11 @@ void topix4_fairmq_receiver::Run()
         int inputSize = msg->GetSize();
         tempdaten.setNumWords(inputSize);
 
+      //  &tempdaten.regdata[0] = &(msg->GetMessage()->data());
+
         memcpy(reinterpret_cast<u_int8_t*>(&tempdaten.regdata[0]),msg->GetData(), msg->GetSize());
 
-        Counter_Compare(tempdaten,previous_dataword,previous_comandoword, true, bigcounter ,writetofile, false );
+        //Counter_Compare(tempdaten,previous_dataword,previous_comandoword, true, bigcounter ,writetofile, false );
 
         delete msg;
     }

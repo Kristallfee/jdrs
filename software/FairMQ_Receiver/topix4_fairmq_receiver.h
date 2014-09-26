@@ -27,13 +27,9 @@ protected:
 
 private:
     WriteToFile* writetofile;
-
     u_int64_t previous_comandoword;
-    //u_int64_t previous_le_dataword;
-    //u_int64_t previous_te_dataword;
     u_int64_t previous_dataword;
     bool bigcounter;
-
 };
 
 #endif // TOPIX4_FAIRMQ_RECEIVER_H
