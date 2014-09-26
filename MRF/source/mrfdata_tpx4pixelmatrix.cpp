@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-TMrfData_Tpx4PixelMatrix::TMrfData_Tpx4PixelMatrix(const u_int32_t& blocklength, const u_int32_t& defaultindex, const u_int32_t& defaultstreamoffset, const u_int32_t& defaultvalueoffset, const bool& defaultreverse, const bool& defaultstreamreverse)
+TMrfData_Tpx4PixelMatrix::TMrfData_Tpx4PixelMatrix(const u_int32_t& blocklength, const u_int32_t& , const u_int32_t& , const u_int32_t& , const bool& , const bool& )
     : TMrfDataAdv3DMatrix(blocklength),_colcount(topix::colcount), _matrixcolount(topix::matrixcolumncount),_matrixrowcout(topix::matrixrowcount)
 {
         initMaps();
@@ -14,13 +14,13 @@ TMrfData_Tpx4PixelMatrix::TMrfData_Tpx4PixelMatrix(const u_int32_t& blocklength,
 void TMrfData_Tpx4PixelMatrix::initMaps()
 {
     _pixelregister.clear();
-    _pixelregister["Mask"]                 = TConfItem(0, 0, 1);
+    _pixelregister["Mask"]                      = TConfItem(0, 0, 1);
     _pixelregister["TestPulsEnable"]            = TConfItem(0, 1, 1);
     _pixelregister["ComparatorTestOutEnable"]   = TConfItem(0, 2, 1);
     _pixelregister["PDAC"]                      = TConfItem(0, 3, 4);
     _pixelregister["NotUsed"]                   = TConfItem(0, 7, 5);
-    _pixelregister["OperationCode"]             = TConfItem(0,12, 5);
-    _pixelregister["Padding"]                   = TConfItem(0,17,15);
+    _pixelregister["OperationCode"]             = TConfItem(0,12, 6);
+    _pixelregister["Padding"]                   = TConfItem(0,18,14);
 
     _rowcount.push_back(topix::shortrowcount);
     _rowcount.push_back(topix::shortrowcount);
@@ -152,7 +152,6 @@ void TMrfData_Tpx4PixelMatrix::assemble(int col, int row)
     setStreamConfItemValue(_localdata.at(col).at(row).find("TestPulsEnable")->second);
     setStreamConfItemValue(_localdata.at(col).at(row).find("ComparatorTestOutEnable")->second);
     setStreamConfItemValue(_localdata.at(col).at(row).find("PDAC")->second);
-    setStreamConfItemValue(_localdata.at(col).at(row).find("PDACSign")->second);
     setStreamConfItemValue(_localdata.at(col).at(row).find("NotUsed")->second);
     setStreamConfItemValue(_localdata.at(col).at(row).find("OperationCode")->second);
     setStreamConfItemValue(_localdata.at(col).at(row).find("Padding")->second);

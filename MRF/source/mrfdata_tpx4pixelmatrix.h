@@ -23,7 +23,7 @@ static const unsigned int matrixrowcount = 20;
 class TMrfData_Tpx4PixelMatrix : virtual public TMrfDataAdv3DMatrix
 {
 public:
-    TMrfData_Tpx4PixelMatrix(const u_int32_t& blocklength = bitsinablock, const u_int32_t& defaultindex = 0, const u_int32_t& defaultstreamoffset = 0, const u_int32_t& defaultvalueoffset = 0, const bool& defaultreverse = false, const bool& defaultstreamreverse = false);
+    TMrfData_Tpx4PixelMatrix(const u_int32_t& blocklength = bitsinablock, const u_int32_t& = 0, const u_int32_t& = 0, const u_int32_t& = 0, const bool& = false, const bool& = false);
 
     void initMaps();
     void assemble(int col, int row);
