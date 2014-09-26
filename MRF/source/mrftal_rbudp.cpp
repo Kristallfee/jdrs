@@ -14,6 +14,7 @@
 #include "mrfdata_mmcmconf.h"
 #include <iostream>
 #include <iomanip>
+#include <math.h>
 
 
 
@@ -83,8 +84,8 @@ int TMrfTal_RBUDP::readOutputBuffer(TMrfData_8b& data, const u_int32_t& wordcoun
 {
     if (deviceIsOpen()) {
         int words_read;
-        if (data.getNumWords() < appendat + wordcount /*+ 1*/) {
-            data.setNumWords(appendat + wordcount /*+ 1*/);
+        if (data.getNumWords() < appendat + wordcount + 5*ceil((wordcount/(5*293.))) /*+ 1*/) {
+            data.setNumWords(appendat + wordcount + 5*ceil((wordcount/(5*293.))) /*+ 1*/);
         }
         if (initReadout() < 0) {
             if (truncate) {
@@ -221,8 +222,6 @@ int TMrfTal_RBUDP::doReadout(const u_int32_t& wordcount, u_int8_t* const startad
         // If the DMA buffer is empty, 0xeeeeeeee is returned. Check for that...
         if ( *(u_int32_t*)(req.memoryAddress) == 0xeeeeeeee && req.wordcount == 1 )
            { req.wordcount = 0;}
-
-       // std::cout << "doReadout::return::wordcount " << req.wordcount << std::endl;
 
         return req.wordcount;
     } else {
