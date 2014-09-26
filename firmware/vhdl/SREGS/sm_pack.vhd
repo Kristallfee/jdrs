@@ -121,8 +121,7 @@ package sample_package is
 	constant LCD_MODE_REG			: integer 	:=16#133#; 	--hex address 4CC 
 	constant LCD_FIFO_CHAR_REG		: integer 	:=16#134#; 	--hex address 4D0 
 	constant CHOOSE_DATA_PATH		: integer	:=16#135#;	--hex address 4D4
-	constant FAKE_DATA_INTERVAL		: integer 	:=16#136#;	--hex address 4D8
-	constant FAKE_DATA_GENERATOR_SINGLE_SHOT_NUMBER : integer := 16#137#;
+	constant FAKE_DATA_INTERVAL	: integer 	:=16#136#;	--hex address 4D8
 --	constant LCD_CHAR_REG_1_1		: integer 	:=16#134#; 	--hex address 4D0 
 --	constant LCD_CHAR_REG_1_2		: integer 	:=16#135#; 	--hex address 4D4
 --	constant LCD_CHAR_REG_1_3		: integer 	:=16#136#; 	--hex address 4D8
