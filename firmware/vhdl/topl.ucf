@@ -103,7 +103,8 @@ NET USER_LED<5>			LOC = AG23  | IOSTANDARD = LVCMOS25;
 NET USER_LED<6>			LOC = AE24  | IOSTANDARD = LVCMOS25;
 NET USER_LED<7>			LOC = AD24  | IOSTANDARD = LVCMOS25;
 
-NET USER_LED_C			LOC = AP24  | IOSTANDARD = LVCMOS25;
+NET USER_LED_C			   LOC = AP24  | IOSTANDARD = LVCMOS25;
+NET USER_BUTTON_C		   LOC = G26;
 
 NET USER_SWITCH<0>		LOC = D22	| IOSTANDARD = LVCMOS15;
 NET USER_SWITCH<1>		LOC = C22	| IOSTANDARD = LVCMOS15;
@@ -114,14 +115,16 @@ NET USER_SWITCH<4>		LOC = C18	| IOSTANDARD = LVCMOS15;
 #NET USER_SWITCH<6>		LOC = K22	| IOSTANDARD = LVCMOS15;
 #NET USER_SWITCH<7>		LOC = K21	| IOSTANDARD = LVCMOS15;
 
+
+
 ##### Module LCD constraints
-NET SF_D<0> 	LOC = "AD14"; ## 4 on J41
-NET SF_D<1> 	LOC = "AK11"; ## 3 on J41
-NET SF_D<2> 	LOC = "AJ11"; ## 2 on J41
-NET SF_D<3> 	LOC = "AE12"; ## 1 on J41
-NET LCD_E   	LOC = "AK12"; ## 9 on J41
-NET LCD_RS  	LOC = "T28"; ## 11 on J41
-NET LCD_RW	  	LOC = "AC14"; ## 10 on J41
+#NET SF_D<0> 	LOC = "AD14"; ## 4 on J41
+#NET SF_D<1> 	LOC = "AK11"; ## 3 on J41
+#NET SF_D<2> 	LOC = "AJ11"; ## 2 on J41
+#NET SF_D<3> 	LOC = "AE12"; ## 1 on J41
+#NET LCD_E   	LOC = "AK12"; ## 9 on J41
+#NET LCD_RS  	LOC = "T28"; ## 11 on J41
+#NET LCD_RW	  	LOC = "AC14"; ## 10 on J41
 
 # fan control: low = fan off, high = fan on
 NET SM_FAN_PWM      LOC = L10;
@@ -359,6 +362,9 @@ NET "FMC_LPC_LA03_N"                LOC = "J32"|IOSTANDARD = LVDS_25 ; ## G10 te
 NET "FMC_LPC_LA04_P"                LOC = "K28"|IOSTANDARD = LVDS_25  | DIFF_TERM = TRUE; ## H10 EOC+
 NET "FMC_LPC_LA04_N"                LOC = "J29"|IOSTANDARD = LVDS_25  | DIFF_TERM = TRUE; ## H11 EOC-
 
+NET "FMC_HPC_LA04_P"                LOC = "AF19"; ## H10 EOC+
+#NET "FMC_HPC_LA04_N"                LOC = "AE19"|IOSTANDARD = LVDS_25  | DIFF_TERM = TRUE; ## H11 EOC-
+
 #NET "FMC_LPC_LA06_P"                LOC = "K33";    ## C10
 #NET "FMC_LPC_LA06_N"                LOC = "J34";    ## C11 on J63
 
@@ -386,23 +392,30 @@ NET "FMC_LPC_LA12_N"                LOC = "E33"| IOSTANDARD = LVDS_25 | DIFF_TER
 #NET "FMC_LPC_LA14_P"                LOC = "C33";    ## C18 on J63
 #NET "FMC_LPC_LA14_N"                LOC = "B34";    ## C19 on J63
 
-NET "FMC_LPC_LA15_P"                LOC = "C32"|IOSTANDARD = LVDS_25 ;    ## H19 ddr_out+
-NET "FMC_LPC_LA15_N"                LOC = "B32"|IOSTANDARD = LVDS_25 ;    ## H20 ddr_out-
+NET "FMC_LPC_LA15_P"                LOC = "C32"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## H19 ddr_out+
+NET "FMC_LPC_LA15_N"                LOC = "B32"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## H20 ddr_out-
 
 NET "FMC_LPC_LA16_P"                LOC = "A33"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE ;    ## G18 data_valid+
 NET "FMC_LPC_LA16_N"                LOC = "B33"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## G19 data_valid-
 
-NET "FMC_LPC_LA19_P"                LOC = "M30"|IOSTANDARD = LVDS_25 ;    ## H22 serial_out+
-NET "FMC_LPC_LA19_N"                LOC = "N30"|IOSTANDARD = LVDS_25 ;    ## H23 serial_out-
+NET "FMC_LPC_LA19_P"                LOC = "M30"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## H22 serial_out+
+NET "FMC_LPC_LA19_N"                LOC = "N30"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## H23 serial_out-
 
-NET "FMC_LPC_LA20_P"                LOC = "P29";    ## G21 sdr_out+
-NET "FMC_LPC_LA20_N"                LOC = "R29";    ## G22 sdr_out-
+NET "FMC_HPC_LA19_P"                LOC = "AN25";    ## H22 serial_out
+
+
+NET "FMC_LPC_LA20_P"                LOC = "P29"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## G21 sdr_out+
+NET "FMC_LPC_LA20_N"                LOC = "R29"|IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;    ## G22 sdr_out-
 
 NET "FMC_LPC_LA21_P"                LOC = "R26"|IOSTANDARD = LVDS_25 ;    ## H25 serial_in+
 NET "FMC_LPC_LA21_N"                LOC = "T26"|IOSTANDARD = LVDS_25 ;    ## H26 serial_in-
 
+NET "FMC_HPC_LA21_P"                LOC = "AN29";    ## H25 serial_in
+
 NET "FMC_LPC_LA22_P"                LOC = "N27";    ## G24 serial_en+
 NET "FMC_LPC_LA22_N"                LOC = "P27";    ## G25 serial_en-
+
+NET "FMC_HPC_LA22_P"                LOC = "AP27";    ## G24 serial_en
 
 #NET "FMC_LPC_LA23_P"                LOC = "R28";    ## D23 on J63
 #NET "FMC_LPC_LA23_N"                LOC = "R27";    ## D24 on J63
@@ -413,6 +426,9 @@ NET "FMC_LPC_LA24_N"                LOC = "P32";    ## H29 cnt_rst-
 NET "FMC_LPC_LA25_P"                LOC = "P31";    ## G27 clock+
 NET "FMC_LPC_LA25_N"                LOC = "P30";    ## G28 clock-
 
+NET "FMC_HPC_LA25_P"                LOC = "AN28";    ## G27 clock+
+NET "FMC_HPC_LA25_N"                LOC = "AM28";    ## G28 clock-
+
 #NET "FMC_LPC_LA26_P"                LOC = "L33";    ## D26 on J63
 #NET "FMC_LPC_LA26_N"                LOC = "M32";    ## D27 on J63 
 
@@ -422,20 +438,28 @@ NET "FMC_LPC_LA25_N"                LOC = "P30";    ## G28 clock-
 NET "FMC_LPC_LA28_P"                LOC = "N33";    ## H31 dac_sdi
 #NET "FMC_LPC_LA28_N"                LOC = "M33";    ## H32 
 
+NET "FMC_HPC_LA28_P"                LOC = "AK27";    ## H31 dac_sdi
+
 NET "FMC_LPC_LA29_P"                LOC = "N34";    ## G30 reset+
 NET "FMC_LPC_LA29_N"                LOC = "P34";    ## G31 reset-
 
 NET "FMC_LPC_LA30_P"                LOC = "M26";    ## H34 dac_sck
 #NET "FMC_LPC_LA30_N"                LOC = "M27";    ## H35 
 
-#NET "FMC_LPC_LA31_P"                LOC = "M31";    ## G33 dac_clr
+NET "FMC_HPC_LA30_P"                LOC = "AJ24";    ## H34 dac_sck
+
+NET "FMC_LPC_LA31_P"                LOC = "M31";    ## G33 dac_clr
 #NET "FMC_LPC_LA31_N"                LOC = "L31";    ## G34 
+
+NET "FMC_HPC_LA31_P"                LOC = "AL29";    ## G33 dac_clr
 
 NET "FMC_LPC_LA32_P"                LOC = "N25";    ## H37 rst_ext+
 NET "FMC_LPC_LA32_N"                LOC = "M25";    ## H38 rst_ext-
 
 NET "FMC_LPC_LA33_P"                LOC = "K32";    ## G36 dac_cs_ld
 #NET "FMC_LPC_LA33_N"                LOC = "K31";    ## G37 
+
+NET "FMC_HPC_LA33_P"                LOC = "AH23";    ## G36 dac_cs_ld
 
 
 

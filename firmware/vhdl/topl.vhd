@@ -56,10 +56,10 @@ entity topl is
 
     -- LCD  interface
     ------------------
-    SF_D                : out std_logic_vector(3 downto 0); --! LCD data bus
-    LCD_E               : out std_logic;              --! LCD: E   (control bit)
-    LCD_RS              : out std_logic;              --! LCD: RS  (setup or data)
-    LCD_RW              : out std_logic;              --! LCD: R/W (read or write)
+ --   SF_D                : out std_logic_vector(3 downto 0); --! LCD data bus
+ --   LCD_E               : out std_logic;              --! LCD: E   (control bit)
+ --   LCD_RS              : out std_logic;              --! LCD: RS  (setup or data)
+ --   LCD_RW              : out std_logic;              --! LCD: R/W (read or write)
 
     -- GMII Interface
     -----------------
@@ -158,6 +158,23 @@ entity topl is
 	FMC_LPC_LA33_P			: out  std_logic;  -- dac_cs_ld
 --	FMC_LPC_LA33_N			: out  std_logic;  -- 
 
+	FMC_HPC_LA28_P 		: out  std_logic;  -- copy DAC_SDI
+   FMC_HPC_LA31_P 		: out  std_logic;  -- copy not (lreset or DAC_CLR)
+   FMC_HPC_LA30_P 		: out  std_logic;  -- copy DAC_SCK
+	FMC_HPC_LA33_P 		: out  std_logic;  -- copy DAC_CS_LD	
+
+	FMC_HPC_LA04_P			: out  std_logic;  -- eoc+
+	FMC_HPC_LA04_N			: out  std_logic;  -- eoc-
+
+	FMC_HPC_LA25_P			: out  std_logic;  -- clock+
+	FMC_HPC_LA25_N			: out  std_logic;  -- clock-
+
+	FMC_HPC_LA19_P			: out  std_logic;  -- serial_out
+
+	FMC_HPC_LA21_P			: out  std_logic;  -- serial_in
+
+	FMC_HPC_LA22_P			: out  std_logic;  -- serial_en
+
 --	FMC_LPC_CLK0_M2C_P	: out  std_logic;  -- 
 --	FMC_LPC_CLK0_M2C_N	: out  std_logic;  -- 
 
@@ -208,6 +225,7 @@ entity topl is
     -------------------------------
     USER_LED            : out std_logic_vector (7 downto 0);  	--! 8 GPIO LEDs
     USER_LED_C			: out std_logic;						--! Center LED
+	 USER_BUTTON_C			: in std_logic;
     USER_SWITCH         : in  std_logic_vector (4 downto 0)		--! 8 GPIO Switches
   );
 end topl;
@@ -234,7 +252,7 @@ architecture Behavioral of topl is
 	signal register_dma_wait      : std_logic;
 	signal register_dma_end       : std_logic;
 	signal register_dma_empty     : std_logic;
-	signal register_dma_count     : std_logic_vector(17 downto 0);
+	signal register_dma_count     : std_logic_vector(31 downto 0);
 	-- signal register_dt_ack       : std_logic;
 
 	-- LCD stuff
@@ -295,7 +313,7 @@ architecture Behavioral of topl is
 begin
 
 	FMC_LPC_LA02_P <= '0';
-
+	FMC_HPC_LA04_P <= topix_eoc;
   ------------------------------------------------------------------------------
   -- ToPix Differential buffers
   ------------------------------------------------------------------------------
@@ -306,9 +324,7 @@ begin
 	O => FMC_LPC_LA00_CC_P,
 	OB => FMC_LPC_LA00_CC_N
 	);
-	
-	topix_testp <= '0';
-	
+
 	OBUFDS_testp :  OBUFDS
 	port map(
 	I =>  topix_testp,
@@ -322,6 +338,13 @@ begin
 	I => FMC_LPC_LA04_P,
 	IB => FMC_LPC_LA04_N
 	);
+
+	--OBUFDS_eoc_copy : OBUFDS
+	--port map(
+	--I => topix_eoc,
+	--O => FMC_HPC_LA04_P,
+	--OB => FMC_HPC_LA04_N
+	--);
 
 	IBUFDS_seu_fsm : IBUFDS
 	port map(
@@ -358,11 +381,9 @@ begin
 	IB => FMC_LPC_LA15_N
 	);
 	
-	topix_data_valid <= '0';
-	
 	IBUFDS_data_vaild : IBUFDS
 	port map(
-	O => open,
+	O => topix_data_valid,
 	I => FMC_LPC_LA16_P,
 	IB => FMC_LPC_LA16_N
 	);
@@ -373,6 +394,8 @@ begin
 	I => FMC_LPC_LA19_P,
 	IB => FMC_LPC_LA19_N
 	);
+	
+	FMC_HPC_LA19_P <= topix_serial_out;
 
 	IBUFDS_sdr_out : IBUFDS
 	port map(
@@ -387,6 +410,10 @@ begin
 	O => FMC_LPC_LA21_P,
 	OB => FMC_LPC_LA21_N
 	);
+	
+	FMC_HPC_LA21_P	<= topix_serial_in;
+
+	
 
 	OBUFDS_serial_en :  OBUFDS
 	port map(
@@ -394,6 +421,8 @@ begin
 	O => FMC_LPC_LA22_P,
 	OB => FMC_LPC_LA22_N
 	);
+	
+	FMC_HPC_LA22_P	<= topix_serial_en;
 	
 	topix_cnt_rst <= '0';
 	
@@ -409,6 +438,13 @@ begin
 	I => topix_clock,
 	O => FMC_LPC_LA25_P,
 	OB => FMC_LPC_LA25_N
+	);
+	
+	OBUFDS_clock_copy :  OBUFDS
+	port map(
+	I => topix_clock,
+	O => FMC_HPC_LA25_P,
+	OB => FMC_HPC_LA25_N
 	);
 	
 	--topix_reset <= lreset ;
@@ -435,6 +471,11 @@ begin
    FMC_LPC_LA31_P <= not (lreset or DAC_CLR);
    FMC_LPC_LA30_P <= DAC_SCK;
 	FMC_LPC_LA33_P <= DAC_CS_LD;
+	
+	FMC_HPC_LA28_P <= DAC_SDI;
+   FMC_HPC_LA31_P <= not (lreset or DAC_CLR);
+   FMC_HPC_LA30_P <= DAC_SCK;
+	FMC_HPC_LA33_P <= DAC_CS_LD;
 	
   ------------------------------------------------------------------------------
   -- Clock generator
@@ -474,78 +515,78 @@ begin
   -- LCD control module
   ------------------------------------------------------------------------------
 
-  LCD_CONTROL : entity work.lcd_control
-  port map (
-    RST           => GLBL_RST,
-    CLK           => clk_50,
-    MODE          => lcd_mode,
-    CONTROL       => lcd_ctrl,  -- LCD_RS, LCD_RW, LCD_E
-    SF_D          => lcd_db,    -- LCD data bus
-    TEMP_IN       => temp_int,
-    TEMP_ADC_IN   => temp_adc_int,
-    FAN_SPEED_IN  => fan_speed_int,
-    REGISTER_ADDR           => register_addr_buf,
-    REGISTER_WRITE_OR_READ  => register_write_or_read_buf,
-    REGISTER_DATA           => register_data_buf,
-
-    UDP_PKG_CTR   => udp_pkg_ctr
-  );
-  -- control signals for the lcd
-  SF_D <= LCD_DB;
-  LCD_E <= LCD_CTRL(0);
-  LCD_RW <= LCD_CTRL(1);
-  LCD_RS <= LCD_CTRL(2);
-
-  -- a command for the register came in, display it on the LCD
-  display_register_set : process ( gtx_clk_bufg, GLBL_RST, register_access, register_access_ready, register_display_counter_running, register_write_or_read )
-  begin
-    if ( register_write_or_read = '1' ) then
-      register_display_counter_enable <= register_display_counter_running or register_access;
-    else
-      register_display_counter_enable <= register_display_counter_running or register_access_ready;
-    end if;
-
-    if rising_edge( gtx_clk_bufg ) then
-
-      -- a global reset came in
-      if ( GLBL_RST = '1' ) then
-        lcd_mode <= lcd_mode_default;
-        register_display_counter <= 0;
-        register_display_counter_running <= '0';
-
-        register_addr_buf <= (others => '0');
-        register_write_or_read_buf <= '0';
-        register_data_buf <= (others => '0');
-
-      -- the display of the register command is active
-      elsif ( lcd_enable_register_display = '1' and register_display_counter_enable = '1' ) then
-        lcd_mode <= "011";
-
-        if ( register_display_counter = register_display_counter_max ) then
-          register_display_counter <= 0;
-          register_display_counter_running <= '0';
-        else
-          if ( register_display_counter = 0 ) then
-            register_addr_buf <= register_addr(11 downto 0); --sregs_regaddr (9 downto 2);--register_addr;
-            register_write_or_read_buf <= register_write_or_read;
-            if ( register_write_or_read = '1' ) then
-              register_data_buf <= register_write_data;
-            else
-              register_data_buf <= register_read_data;
-            end if;
-          end if;
-
-          register_display_counter_running <= '1';
-          register_display_counter <= register_display_counter + 1;
-        end if;
-
-      -- fall back to displaying the default
-      else
-        lcd_mode <= lcd_mode_default;
-      end if;
-    end if;
-
-  end process;
+--  LCD_CONTROL : entity work.lcd_control
+--  port map (
+--    RST           => GLBL_RST,
+--    CLK           => clk_50,
+--    MODE          => lcd_mode,
+--    CONTROL       => lcd_ctrl,  -- LCD_RS, LCD_RW, LCD_E
+--    SF_D          => lcd_db,    -- LCD data bus
+--    TEMP_IN       => temp_int,
+--    TEMP_ADC_IN   => temp_adc_int,
+--    FAN_SPEED_IN  => fan_speed_int,
+--    REGISTER_ADDR           => register_addr_buf,
+--    REGISTER_WRITE_OR_READ  => register_write_or_read_buf,
+--    REGISTER_DATA           => register_data_buf,
+--
+--    UDP_PKG_CTR   => udp_pkg_ctr
+--  );
+--  -- control signals for the lcd
+--  SF_D <= LCD_DB;
+--  LCD_E <= LCD_CTRL(0);
+--  LCD_RW <= LCD_CTRL(1);
+--  LCD_RS <= LCD_CTRL(2);
+--
+--  -- a command for the register came in, display it on the LCD
+--  display_register_set : process ( gtx_clk_bufg, GLBL_RST, register_access, register_access_ready, register_display_counter_running, register_write_or_read )
+--  begin
+--    if ( register_write_or_read = '1' ) then
+--      register_display_counter_enable <= register_display_counter_running or register_access;
+--    else
+--      register_display_counter_enable <= register_display_counter_running or register_access_ready;
+--    end if;
+--
+--    if rising_edge( gtx_clk_bufg ) then
+--
+--      -- a global reset came in
+--      if ( GLBL_RST = '1' ) then
+--        lcd_mode <= lcd_mode_default;
+--        register_display_counter <= 0;
+--        register_display_counter_running <= '0';
+--
+--        register_addr_buf <= (others => '0');
+--        register_write_or_read_buf <= '0';
+--        register_data_buf <= (others => '0');
+--
+--      -- the display of the register command is active
+--      elsif ( lcd_enable_register_display = '1' and register_display_counter_enable = '1' ) then
+--        lcd_mode <= "011";
+--
+--        if ( register_display_counter = register_display_counter_max ) then
+--          register_display_counter <= 0;
+--          register_display_counter_running <= '0';
+--        else
+--          if ( register_display_counter = 0 ) then
+--            register_addr_buf <= register_addr(11 downto 0); --sregs_regaddr (9 downto 2);--register_addr;
+--            register_write_or_read_buf <= register_write_or_read;
+--            if ( register_write_or_read = '1' ) then
+--              register_data_buf <= register_write_data;
+--            else
+--              register_data_buf <= register_read_data;
+--            end if;
+--          end if;
+--
+--          register_display_counter_running <= '1';
+--          register_display_counter <= register_display_counter + 1;
+--        end if;
+--
+--      -- fall back to displaying the default
+--      else
+--        lcd_mode <= lcd_mode_default;
+--      end if;
+--    end if;
+--
+--  end process;
 
   ------------------------------------------------------------------------------
   -- Ethernet wrapper
@@ -605,6 +646,7 @@ begin
     REGISTER_DMA_EMPTY      => register_dma_empty,
     REGISTER_DMA_COUNT      => register_dma_count,
     REGISTER_CLK            => sregs_clk,
+	 USER_BUTTON_C				 => USER_BUTTON_C,
     datacheck_trigger		=> datacheck_trigger_int
 
   );
@@ -649,6 +691,7 @@ USER_LED_C	<= datacheck_trigger_int;
 	TOPIX_DATA_VALID	=> topix_data_valid,
 	TOPIX_SDR_OUT		=> topix_sdr_out,
 	TOPIX_RESET_OUT		=> topix_reset,			--! Reset signal for topix
+	TPX_TESTP_OUT		=> topix_testp,
 	TPX_SDATA_IN		=> topix_serial_in,		--! Serial data from topix
 	TPX_SDATA_EN		=> topix_serial_en,		--! Serial data enable signal to topix
 	TPX_SDATA_OUT		=> topix_serial_out,	--! Serial data to topix
