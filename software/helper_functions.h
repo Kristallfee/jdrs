@@ -57,11 +57,6 @@ void Counter_Compare(TMrfData_8b tempdaten, u_int64_t &previous_dataword,u_int64
         if(savedata)
         {
             writetofile->AppendToData(QString("%1").arg((u_int64_t)dataword,10,16,QChar('0')));
-            //writetofile->AppendToData(" - ");
-            //writetofile->AppendToData(le_dataword);
-            //writetofile->AppendToData(" ");
-            //writetofile->AppendToData(te_dataword);
-            //writetofile->AppendToData(" ");
         }
 
         if(bigcountercheck == true)
@@ -110,7 +105,6 @@ void Counter_Compare(TMrfData_8b tempdaten, u_int64_t &previous_dataword,u_int64
                 LOG(DEBUG) << std::hex << "CmdWordOld " << previous_comandoword;
                 LOG(DEBUG) << std::hex << "CmdWord    " << CmdWord;
 
-
                 std::cout << std::setfill('0') << std::setw(2);
 
                 if(i>9)
@@ -121,7 +115,6 @@ void Counter_Compare(TMrfData_8b tempdaten, u_int64_t &previous_dataword,u_int64
             {
                 std::cout << "First Dataword in package" << std::endl;
             }
-
                 if(i>4)
             {
                 std::cout << std::setfill('0') << std::setw(2)<< std::hex <<  (u_int16_t)(tempdaten.getWord(i-5))<< (u_int16_t)(tempdaten.getWord(i-4))<< (u_int16_t)(tempdaten.getWord(i-3)) << (u_int16_t)(tempdaten.getWord(i-2))<<  (u_int16_t)(tempdaten.getWord(i-1))  << std::endl;
@@ -130,7 +123,6 @@ void Counter_Compare(TMrfData_8b tempdaten, u_int64_t &previous_dataword,u_int64
             {
                 std::cout << "First Dataword in package" << std::endl;
             }
-
                 std::cout << std::hex << "dataword " <<  dataword << std::endl;
                 if(i< tempdaten.getNumWords()-9 && tempdaten.getNumWords()>9 )
             {
@@ -144,19 +136,14 @@ void Counter_Compare(TMrfData_8b tempdaten, u_int64_t &previous_dataword,u_int64
                 if(i< tempdaten.getNumWords()-14 && tempdaten.getNumWords()>14 )
             {
                 std::cout << std::setfill('0') << std::setw(2)<< std::hex <<  static_cast<int>(tempdaten.getWord(i+10))<< static_cast<int>(tempdaten.getWord(i+11))<< static_cast<int>(tempdaten.getWord(i+12)) << static_cast<int>(tempdaten.getWord(i+13))<<  static_cast<int>(tempdaten.getWord(i+14))  << std::endl;
-
             }
                 else
             {
                 std::cout << "Last Dataword in package" << std::endl;
             }
                 LOG(INFO) << "=====" ;
-
             }
-
         }
-        //  previous_le_dataword = le_dataword;
-        //  previous_te_dataword = te_dataword;
         previous_dataword = dataword;
 
         if(savedata)
