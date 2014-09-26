@@ -77,7 +77,7 @@ fifo_topix_sdata_buffer : entity work.sdata_buffer_fifo  -- Buffers words from r
 		wr_data_count	=> REGISTER_MODULE_DATA_COUNT_OUT(9 downto 0)
 	);
 
-topix_fifo_sdata_buffer : entity work.sdata_buffer_fifo -- Buffers words from topix to be read from register
+topix_fifo_sdata_buffer : entity work.sdata_buffer_fifo_fwft -- Buffers words from topix to be read from register
 	PORT MAP (
 		rst				=> RESET_IN,
 		wr_clk			=> CLOCK_TOPIX,
