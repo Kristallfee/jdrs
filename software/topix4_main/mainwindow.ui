@@ -662,7 +662,7 @@
        </rect>
       </property>
       <property name="title">
-       <string>This PC/Notebook</string>
+       <string>This PC/Notebook (MainSoftware)</string>
       </property>
       <widget class="QComboBox" name="comboBox_ownIPAdresses">
        <property name="geometry">
@@ -711,7 +711,7 @@
       </widget>
       <widget class="QSpinBox" name="spinBox_ownPort">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -827,7 +827,7 @@
       </widget>
       <widget class="QSpinBox" name="spinBox_remotePort">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -959,6 +959,110 @@
        </property>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="groupBox_ownConnection_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>301</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>This PC/Notebook (FairMQ StateMachine)</string>
+      </property>
+      <widget class="QComboBox" name="comboBox_ownIPAdresses_FairMQ">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>30</y>
+         <width>161</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_ownIPAddresses_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>33</y>
+         <width>71</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>IP address:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_ownPort_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>68</y>
+         <width>71</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Port:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spinBox_ownPort_FairMQ">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>64</y>
+         <width>81</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1024</number>
+       </property>
+       <property name="maximum">
+        <number>65536</number>
+       </property>
+       <property name="value">
+        <number>50001</number>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="toolButton_refreshOwnIP_1">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>30</y>
+         <width>27</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/icons/Refresh.png</normaloff>:/icons/Refresh.png</iconset>
+       </property>
+      </widget>
+     </widget>
+     <zorder>groupBox_ownConnection</zorder>
+     <zorder>pushButton_Disconnect_UDP</zorder>
+     <zorder>pushButton_Connect_UDP</zorder>
+     <zorder>groupBox_remoteConnection</zorder>
+     <zorder>groupBox_checkConnection</zorder>
+     <zorder>groupBox_ownConnection_3</zorder>
+     <zorder>toolButton_refreshOwnIP</zorder>
     </widget>
     <widget class="QWidget" name="Register_Tab">
      <attribute name="title">
@@ -1446,11 +1550,429 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
+     <widget class="QSpinBox" name="spinBox_numberoddmapackages">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>710</y>
+        <width>52</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100000</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_start_fairmq_thread">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>500</y>
+        <width>191</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start FairMQ Thread</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_stop_fairmq_thread">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>600</y>
+        <width>191</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Stop FairMQ Thread</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="gridLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>660</y>
+        <width>351</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_fairmq_watermark">
+         <property name="text">
+          <string>1000</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="pushButton_fillFifo_3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Change Message Size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit_fairmq_message_size">
+         <property name="text">
+          <string>290</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Message Size (# 40 bit words)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="pushButton_fillFifo_4">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Set Watermark</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Watermark</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="pushButton_pause_fairmq_sm">
+      <property name="geometry">
+       <rect>
+        <x>730</x>
+        <y>560</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Pause SM</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_start_fairmq_sm">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>560</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start SM</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_stop_fairmq_sm">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>560</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Stop SM</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_ConfigFakeData">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>340</y>
+        <width>141</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Config Fake Data</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_fakedata_cyclesbetweenmessages">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>390</y>
+        <width>53</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ffffff</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_transportvalue_3">
+      <property name="geometry">
+       <rect>
+        <x>540</x>
+        <y>380</y>
+        <width>80</width>
+        <height>39</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>80</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Cycles:  0x</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_bigcounter">
+      <property name="geometry">
+       <rect>
+        <x>750</x>
+        <y>410</y>
+        <width>132</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>BigCounter</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_savetofile">
+      <property name="geometry">
+       <rect>
+        <x>750</x>
+        <y>440</y>
+        <width>132</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save to File </string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_savetofile_path">
+      <property name="geometry">
+       <rect>
+        <x>730</x>
+        <y>470</y>
+        <width>181</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>/private/esch/temp/</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="LTC2604">
+     <attribute name="title">
+      <string>LTC2604</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_ltc2620dacvalues">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>10</y>
+        <width>452</width>
+        <height>581</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>LTC2604 DAC Configuration</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="groupBox_ltc2620dacvalues_3">
+         <property name="title">
+          <string>DAC Values</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QTableWidget" name="tableWidget_ltc2604dacs"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_dacactivated_2">
+         <property name="title">
+          <string>DAC Activated</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QTableWidget" name="tableWidget_ltc2604dacactivated"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line_8">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_ltc2604clear">
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_ltc2604cancel">
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_configureltc2604">
+           <property name="text">
+            <string>Apply</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_ltc2620command">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>452</width>
+        <height>281</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>LTC2604 Command</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QTableWidget" name="tableWidget_ltc2604command"/>
+       </item>
+       <item>
+        <widget class="Line" name="line_9">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_ltc2604clearcommand">
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_ltc2604cancelcommand">
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_ltc2604sendcommand">
+           <property name="text">
+            <string>Send</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_14">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>600</y>
+        <width>451</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Load Settings for Modules</string>
+      </property>
+      <widget class="QPushButton" name="pushButton_ltc2604loadmodule4">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>40</y>
+         <width>181</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Load settings for Module </string>
+       </property>
+      </widget>
+     </widget>
      <widget class="QGroupBox" name="groupBox_12">
       <property name="geometry">
        <rect>
-        <x>720</x>
-        <y>390</y>
+        <x>20</x>
+        <y>320</y>
         <width>181</width>
         <height>321</height>
        </rect>
@@ -1602,385 +2124,6 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </widget>
-     <widget class="QSpinBox" name="spinBox_numberoddmapackages">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>710</y>
-        <width>52</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>100000</number>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_start_fairmq_thread">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>470</y>
-        <width>191</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Start FairMQ Thread</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_stop_fairmq_thread">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>570</y>
-        <width>191</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stop FairMQ Thread</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="gridLayoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>340</x>
-        <y>650</y>
-        <width>371</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="2">
-        <widget class="QPushButton" name="pushButton_fillFifo_3">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Change Message Size</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit_fairmq_message_size">
-         <property name="text">
-          <string>20000</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Message Size (# 40 bit words)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton_fillFifo_4">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Set Watermark</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_fairmq_watermark">
-         <property name="text">
-          <string>1000</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Watermark</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QPushButton" name="pushButton_pause_fairmq_sm">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>530</y>
-        <width>91</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Pause SM</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_start_fairmq_sm">
-      <property name="geometry">
-       <rect>
-        <x>380</x>
-        <y>530</y>
-        <width>91</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Start SM</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_stop_fairmq_sm">
-      <property name="geometry">
-       <rect>
-        <x>580</x>
-        <y>530</y>
-        <width>91</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stop SM</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_ConfigFakeData">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>360</y>
-        <width>181</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Config Fake Data</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_fakedata_cyclesbetweenmessages">
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>410</y>
-        <width>53</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>ffffff</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_transportvalue_3">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>400</y>
-        <width>80</width>
-        <height>39</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>80</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>80</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Cycles:  0x</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="LTC2604">
-     <attribute name="title">
-      <string>LTC2604</string>
-     </attribute>
-     <widget class="QGroupBox" name="groupBox_ltc2620dacvalues">
-      <property name="geometry">
-       <rect>
-        <x>466</x>
-        <y>10</y>
-        <width>452</width>
-        <height>715</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>LTC2604 DAC Configuration</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QGroupBox" name="groupBox_ltc2620dacvalues_3">
-         <property name="title">
-          <string>DAC Values</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="QTableWidget" name="tableWidget_ltc2604dacs"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_dacactivated_2">
-         <property name="title">
-          <string>DAC Activated</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <widget class="QTableWidget" name="tableWidget_ltc2604dacactivated"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line_8">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_ltc2604clear">
-           <property name="text">
-            <string>Clear</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_ltc2604cancel">
-           <property name="text">
-            <string>Cancel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_configureltc2604">
-           <property name="text">
-            <string>Apply</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_ltc2620command">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>452</width>
-        <height>471</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>LTC2604 Command</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_8">
-       <item>
-        <widget class="QTableWidget" name="tableWidget_ltc2604command"/>
-       </item>
-       <item>
-        <widget class="Line" name="line_9">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_ltc2604clearcommand">
-           <property name="text">
-            <string>Clear</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_ltc2604cancelcommand">
-           <property name="text">
-            <string>Cancel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_ltc2604sendcommand">
-           <property name="text">
-            <string>Send</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_14">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>510</y>
-        <width>431</width>
-        <height>201</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Load Settings for Modules</string>
-      </property>
-      <widget class="QPushButton" name="pushButton_ltc2604loadmodule4">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>40</y>
-         <width>181</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Load settings for Module </string>
-       </property>
-      </widget>
-     </widget>
     </widget>
     <widget class="QWidget" name="Chip_Configuration">
      <attribute name="title">
@@ -1990,7 +2133,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>70</x>
-        <y>680</y>
+        <y>590</y>
         <width>91</width>
         <height>24</height>
        </rect>
@@ -2005,7 +2148,7 @@ p, li { white-space: pre-wrap; }
         <x>20</x>
         <y>50</y>
         <width>434</width>
-        <height>621</height>
+        <height>511</height>
        </rect>
       </property>
      </widget>
@@ -2013,7 +2156,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>680</y>
+        <y>590</y>
         <width>96</width>
         <height>24</height>
        </rect>
@@ -2026,7 +2169,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>680</y>
+        <y>590</y>
         <width>96</width>
         <height>24</height>
        </rect>
@@ -2041,7 +2184,7 @@ p, li { white-space: pre-wrap; }
         <x>470</x>
         <y>50</y>
         <width>434</width>
-        <height>621</height>
+        <height>511</height>
        </rect>
       </property>
      </widget>
@@ -2084,8 +2227,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_topix4readccr">
       <property name="geometry">
        <rect>
-        <x>540</x>
-        <y>680</y>
+        <x>560</x>
+        <y>590</y>
         <width>96</width>
         <height>24</height>
        </rect>
@@ -2097,8 +2240,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_topix4clearread">
       <property name="geometry">
        <rect>
-        <x>650</x>
-        <y>680</y>
+        <x>660</x>
+        <y>590</y>
         <width>96</width>
         <height>24</height>
        </rect>
@@ -2110,8 +2253,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="gridLayoutWidget_11">
       <property name="geometry">
        <rect>
-        <x>770</x>
-        <y>690</y>
+        <x>230</x>
+        <y>620</y>
         <width>141</width>
         <height>27</height>
        </rect>
@@ -2120,7 +2263,7 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit_readbacklength">
          <property name="text">
-          <string>18</string>
+          <string>19</string>
          </property>
         </widget>
        </item>
@@ -2132,6 +2275,58 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QPushButton" name="pushButton_topix4loadcommand">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>620</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Load Configuration</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_topix4readccr0">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>630</y>
+        <width>96</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Read CCR 0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_topix4readccr1">
+      <property name="geometry">
+       <rect>
+        <x>610</x>
+        <y>630</y>
+        <width>96</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Read CCR 1</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_topix4readccr2">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>630</y>
+        <width>96</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Read CCR 2</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab">
@@ -2161,8 +2356,126 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Manual Commands</string>
+       </attribute>
+       <widget class="QWidget" name="gridLayoutWidget_3">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>331</width>
+          <height>172</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="5" column="1">
+          <widget class="QPushButton" name="pushButton_selectcolumn3">
+           <property name="text">
+            <string>Select Column 3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="pushButton_normalmode">
+           <property name="text">
+            <string>Normal Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="pushButton_configmode">
+           <property name="text">
+            <string>Config Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QPushButton" name="pushButton_selectcolumn2">
+           <property name="text">
+            <string>Select Column 2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QPushButton" name="pushButton_selectcolumn5">
+           <property name="text">
+            <string>Select Column 5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="pushButton_selectcolumn1">
+           <property name="text">
+            <string>Select Column 1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QPushButton" name="pushButton_selectcolumn0">
+           <property name="text">
+            <string>Select Column 0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="pushButton_readbackpixelconfiguration">
+           <property name="text">
+            <string>Readback Pixel Configuration</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QPushButton" name="pushButton_selectcolumn4">
+           <property name="text">
+            <string>Select Column 4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButton_injectchargeinternalunsync">
+           <property name="text">
+            <string>Inject Charge! (internal)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="pushButton_readnextpixel">
+           <property name="text">
+            <string>Read next Pixel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QPushButton" name="pushButton_selectcolumn6">
+           <property name="text">
+            <string>Select Column 6</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QPushButton" name="pushButton_selectcolumn7">
+           <property name="text">
+            <string>Select Column 7</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QTextEdit" name="textEdit_readbackpixelconfiguration">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>30</y>
+          <width>521</width>
+          <height>591</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
         <string>Mask</string>
@@ -2179,7 +2492,7 @@ p, li { white-space: pre-wrap; }
        </widget>
        <widget class="QPushButton" name="pushButton_p3maskclear">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="geometry">
          <rect>
@@ -2291,9 +2604,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="horizontalLayoutWidget_4">
         <property name="geometry">
          <rect>
-          <x>150</x>
+          <x>97</x>
           <y>0</y>
-          <width>748</width>
+          <width>801</width>
           <height>41</height>
          </rect>
         </property>
@@ -2302,6 +2615,13 @@ p, li { white-space: pre-wrap; }
           <widget class="QPushButton" name="pushButton_p3pdacsetalltozero">
            <property name="text">
             <string>Set all PDAC to Zero</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_p3pdacsetallto15">
+           <property name="text">
+            <string>Set all PDAC to 15</string>
            </property>
           </widget>
          </item>

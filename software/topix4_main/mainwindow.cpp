@@ -32,16 +32,67 @@ MainWindow::MainWindow(QWidget *parent) :
     on_pushButton_ltc2604clear_clicked();
     on_pushButton_ltc2604clearcommand_clicked();
     on_pushButton_topix4clearcommand_clicked();
+    on_pushButton_topix4clearread_clicked();
     _end_readout = false;
     on_toolButton_refreshOwnIP_clicked();
+    on_toolButton_refreshOwnIP_1_clicked();
+
+    on_pushButton_p3allclear_clicked();
+    p3testpulsclear();
+    ui->tableWidget_p3masktest->setRowCount(20);
+    ui->tableWidget_p3masktest->setColumnCount(32);
+    on_pushButton_p3maskclear_clicked();
+    p3testpulsclear();
+    _errorstrcon = new TMrfStrError();
+    _errorstrcon->setDelimiter("");
 
 }
 
 MainWindow::~MainWindow()
 {
+   // fairmqreadout.ChangeState(ToPix4_FairMQ_Reaout::STOP);
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::END);
     delete ui;
 }
+
+void MainWindow::on_pushButton_injectchargeinternalunsync_clicked()
+{
+    injectChargeInternalUnsync();
+}
+
+void MainWindow::injetChargeInternalSync(int delay, int wait)
+{
+    std::cout << "not yet implemented " << delay<< wait<<  std::endl;
+}
+
+
+
+void MainWindow::injectChargeInternalUnsync()
+{
+//    _topix4command.setOperationCode(topix4_command::);
+//    _topixflags.setLocalItemValue("CounterReset", 1);
+//    _topixflags.assemble();
+//    _topixcrtl.configTopixSlowReg(_topixflags);
+//    _topixflags.setLocalItemValue("CounterReset", 0);
+//    _topixflags.assemble();
+//    _topixcrtl.configTopixSlowReg(_topixflags);
+
+    _topix4control.write(0x480,2);
+    usleep(5);
+    _topix4control.write(0x480,0);
+
+
+//    _topix.setLocalItemValue("TestPin", 1);
+//    _topixflags.assemble();
+//    _topixcrtl.configTopixSlowReg(_topixflags);
+//    usleep(5);
+//    _topixflags.setLocalItemValue("TestPin", 0);
+//    _topixflags.assemble();
+//    _topixcrtl.configTopixSlowReg(_topixflags);
+}
+
+
+//#############################
 
 void MainWindow::on_pushButton_start_fairmq_sm_clicked()
 {
@@ -69,7 +120,6 @@ void MainWindow::on_pushButton_stop_fairmq_thread_clicked()
 
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::END);
     fairmqreadout.CloseASICConnection();
-    //fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::Shutdown());
 }
 
 void MainWindow::DoFairMQReadout()
@@ -79,15 +129,17 @@ void MainWindow::DoFairMQReadout()
        on_pushButton_Disconnect_UDP_clicked();
     }
 
-    QStringList ownIP = ui->comboBox_ownIPAdresses->currentText().split(" ");
+    QStringList ownIP = ui->comboBox_ownIPAdresses_FairMQ->currentText().split(" ");
     QString connectionParameter = QString("%1,%2,%3,%4")
             .arg(ownIP[0])
-            .arg(ui->spinBox_ownPort->value())
+            .arg(ui->spinBox_ownPort_FairMQ->value())
             .arg(ui->lineEdit_remoteIPAddress->text())
             .arg(ui->spinBox_remotePort->value());
 
     FairMQTransportFactory* transportFactory = new FairMQTransportFactoryZMQ();
 
+    fairmqreadout.SetBigCounter(ui->checkBox_bigcounter->isChecked());
+    fairmqreadout.SetSaveData(ui->checkBox_savetofile->isChecked(),ui->lineEdit_savetofile_path->text());
     fairmqreadout.SetOutputWindow(ui->textEdit_Dmadata);
     fairmqreadout.SetTransport(transportFactory);
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::Id, 100);
@@ -256,9 +308,7 @@ void MainWindow::on_pushButton_Readdmadata_clicked()
     ui->textEdit_Dmadata->append("Readback: " + QString::number(tempdaten.getNumWords()/5) + " words.");
     for(u_int i=0; i< tempdaten.getNumWords();i+=5)
     {
-      // ui->textEdit_Dmadata->append(QString::fromStdString(tempdaten.exportBinString()));
         ui->textEdit_Dmadata->append(QString::number((u_int16_t)tempdaten.getWord(i),16)+" "+ QString::number((u_int16_t)tempdaten.getWord(i+1),16)+" "+QString::number((u_int16_t)tempdaten.getWord(i+2),16)+" "+QString::number((u_int16_t)tempdaten.getWord(i+3),16)+" "+QString::number((u_int16_t)tempdaten.getWord(i+4),16));
-
     }
 }
 
@@ -338,11 +388,20 @@ void MainWindow::on_pushButton_ltc2604sendcommand_clicked()
 
 void MainWindow::on_pushButton_ltc2604loadmodule4_clicked()
 {
-    _ltc2604.setDACValue("LTC1","DACA",45524);
-    _ltc2604.setDACValue("LTC1","DACB",40219);
-    _ltc2604.setDACValue("LTC1","DACC",37516);
-    _ltc2604.setDACValue("LTC1","DACD",34850);
-    _ltc2604.setDACValue("LTC2","DACA",38616);
+    _ltc2604.setDACValue("LTC1","DACA",5000);
+    _ltc2604.setDACValue("LTC1","DACB",45580);
+    _ltc2604.setDACValue("LTC1","DACC",40350);
+    _ltc2604.setDACValue("LTC1","DACD",37600);
+    _ltc2604.setDACValue("LTC2","DACC",37300);
+    _ltc2604.setDACValue("LTC2","DACD",32450);
+
+    _ltc2604.setDACActivated("LTC1","DACA",1);
+    _ltc2604.setDACActivated("LTC1","DACB",1);
+    _ltc2604.setDACActivated("LTC1","DACC",1);
+    _ltc2604.setDACActivated("LTC1","DACD",1);
+    _ltc2604.setDACActivated("LTC2","DACC",1);
+    _ltc2604.setDACActivated("LTC2","DACD",1);
+
     on_pushButton_ltc2604clear_clicked();
 }
 
@@ -414,6 +473,32 @@ void MainWindow::on_toolButton_refreshOwnIP_clicked() {
     }
 }
 
+void MainWindow::on_toolButton_refreshOwnIP_1_clicked() {
+    _hostAddressMap = _topix4control.getIfAddresses();
+    QString selectedItem = ui->comboBox_ownIPAdresses_FairMQ->currentText();
+
+    // clean the current list first
+    while ( ui->comboBox_ownIPAdresses_FairMQ->count() > 0 ) {
+        ui->comboBox_ownIPAdresses_FairMQ->removeItem(0);
+    }
+
+    std::map<std::string,std::string>::iterator it;
+    QString currentItem;
+    for ( it = _hostAddressMap.begin(); it != _hostAddressMap.end(); it++ ) {
+        // skip localhost and loopback devices
+        if ( (*it).first.compare("127.0.0.1") == 0 ||
+             (*it).second.compare("lo0") == 0 ||
+             (*it).second.compare("lo") == 0 )
+            continue;
+
+        currentItem = QString("%1 (%2)").arg( (*it).first.c_str() ).arg( (*it).second.c_str() );
+        ui->comboBox_ownIPAdresses_FairMQ->addItem( currentItem );
+
+        // set the selected item to the old one
+        if ( !selectedItem.isEmpty() && currentItem.compare(selectedItem) == 0 )
+            ui->comboBox_ownIPAdresses_FairMQ->setCurrentIndex( ui->comboBox_ownIPAdresses_FairMQ->count()-1 );
+    }
+}
 
 void MainWindow::on_pushButton_Ping_clicked() {
     QIcon pingResultGood(":/icons/Check.png");
@@ -465,6 +550,54 @@ void MainWindow::on_pushButton_topix4sendcommand_clicked()
    // Error();
 }
 
+void MainWindow::on_pushButton_topix4loadcommand_clicked()
+{
+    _topix4ccr.setCommand(topix4_ccrnumber::ccr0,32);
+    _topix4ccr.setCommand(topix4_ccrnumber::ccr1,33);
+    _topix4ccr.setCommand(topix4_ccrnumber::ccr2,34);
+
+    _topix4ccr.setLocalItemValue("CounterEnable",1);
+    _topix4ccr.setLocalItemValue("FreezeStop",4);
+    _topix4ccr.setLocalItemValue("CounterStopValue",4095);
+
+
+    on_pushButton_topix4clearcommand_clicked();
+}
+
+
+void MainWindow::on_pushButton_topix4readccr0_clicked()
+{
+    _topix4control.readCCR0(_topix4ccrread);
+    _topix4ccrread.disassemble();
+
+    clearItemTable(getIteratorItemCount(_topix4ccrread.getConstItemIteratorBegin(), _topix4ccrread.getConstItemIteratorEnd()),*ui->tableWidget_topix3_ccr_read);
+    fillItemTable(_topix4ccrread, *ui->tableWidget_topix3_ccr_read);
+    Error();
+}
+
+void MainWindow::on_pushButton_topix4readccr1_clicked()
+{
+    _topix4ccrread.clearDataStream();
+    _topix4control.readCCR1(_topix4ccrread);
+    _topix4ccrread.disassemble();
+
+    clearItemTable(getIteratorItemCount(_topix4ccrread.getConstItemIteratorBegin(), _topix4ccrread.getConstItemIteratorEnd()),*ui->tableWidget_topix3_ccr_read);
+    fillItemTable(_topix4ccrread, *ui->tableWidget_topix3_ccr_read);
+    Error();
+}
+
+void MainWindow::on_pushButton_topix4readccr2_clicked()
+{
+    _topix4control.readCCR2(_topix4ccrread);
+    _topix4ccrread.disassemble();
+
+    clearItemTable(getIteratorItemCount(_topix4ccrread.getConstItemIteratorBegin(), _topix4ccrread.getConstItemIteratorEnd()),*ui->tableWidget_topix3_ccr_read);
+    fillItemTable(_topix4ccrread, *ui->tableWidget_topix3_ccr_read);
+    Error();
+}
+
+
+
 void MainWindow::on_pushButton_topix4readccr_clicked()
 {
     _topix4control.readCCR0(_topix4ccrread);
@@ -487,6 +620,179 @@ void MainWindow::on_pushButton_topix4clearread_clicked()
     fillItemTable(_topix4ccrread, *ui->tableWidget_topix3_ccr_read);
 }
 
+// *************************************************************************************
+//tab pixel configuration
+// *************************************************************************************
+
+void MainWindow::on_pushButton_readnextpixel_clicked()
+{
+
+
+    _topix4command.setOperationCode(topix4_command::readpixelconfiguration);
+    _topix4command.assemble();
+ //   _pixelconfig.setPixCommand(0,pixel,topix4_command::readpixelconfiguration);
+  //  _pixelconfig.assemble(sel,pixel);
+    _topix4control.writeRemoteData(_topix4command);
+ //   _pixelconfig.setPixCommand(sel,pixel,topix4_command::nooperation);
+ //   _pixelconfig.assemble(sel,pixel);
+    _topix4command.setOperationCode(topix4_command::nooperation);
+    _topix4command.assemble();
+    _topix4control.writeRemoteData(_topix4command);
+
+    _topix4command.setOperationCode(topix4_command::movetonextpixel);
+    _topix4command.assemble();
+    _topix4control.writeRemoteData(_topix4command);
+
+    _topix4control.boardCommand(tpxctrl_value::topix4config);
+    _topix4control.read(tpx_address::sdataout);
+
+    _pixelreadback.setWord(0,_topix4control.read(tpx_address::sdataout));
+
+    _topix4control.read(tpx_address::sdataout);
+
+    _pixelreadback.disassemble();
+    ui->textEdit_readbackpixelconfiguration->append( " Operation Command " +QString::number(_pixelreadback.getOperationCode())+ " DAC " + QString::number(_pixelreadback.getThresholdDAC()) + " TestPuls " + QString::number(_pixelreadback.getTestPulsEnable()) + " Comparator "+ QString::number(_pixelreadback.getComparatorTestOutEnable())  + " Mask " + QString::number(_pixelreadback.getPixelMask()) );
+    ui->textEdit_readbackpixelconfiguration->append(QString::number((u_int16_t)_pixelreadback.getWord(0),16));
+}
+
+void MainWindow::on_pushButton_readbackpixelconfiguration_clicked()
+{
+    selectcolumn(0);
+
+    on_pushButton_configmode_clicked();
+
+    for(int sel=0;sel<_pixelconfig.getColumnCount();sel++)
+    {
+        selectcolumn(sel);
+        ui->textEdit_readbackpixelconfiguration->append("################ sel " + sel);
+        _topix4command.setOperationCode(topix4_command::movetonextpixel);
+        _topix4command.assemble();
+
+        for(int pixel=_pixelconfig.getRowCount(sel)-1;pixel>-1;pixel--)
+        {
+
+            std::cout << "_pixelconfig.getRowCount(sel) " << _pixelconfig.getRowCount(sel) << " sel " << sel << " pixel " << pixel <<std::endl;
+            _pixelconfig.setPixCommand(sel,pixel,topix4_command::readpixelconfiguration);
+            _pixelconfig.assemble(sel,pixel);
+            _topix4control.writeRemoteData(_pixelconfig);
+
+            _pixelconfig.setPixCommand(sel,pixel,topix4_command::nooperation);
+            _pixelconfig.assemble(sel,pixel);
+            _topix4control.writeRemoteData(_pixelconfig);
+
+            _topix4control.writeRemoteData(_topix4command);
+
+            _topix4control.boardCommand(tpxctrl_value::topix4config);
+            _topix4control.read(tpx_address::sdataout);
+            _topix4control.read(tpx_address::sdataout);
+            _pixelreadback.setWord(0,_topix4control.read(tpx_address::sdataout));
+
+            _pixelreadback.disassemble();
+            ui->textEdit_readbackpixelconfiguration->append("Loop Number " + QString::number(pixel) + " Operation Code " + QString::number(_pixelreadback.getOperationCode()) + " DAC " + QString::number(_pixelreadback.getThresholdDAC())+  " Comparator "+ QString::number(_pixelreadback.getComparatorTestOutEnable())  + " TestPuls " + QString::number(_pixelreadback.getTestPulsEnable()) + " Mask " + QString::number(_pixelreadback.getPixelMask()) );
+            ui->textEdit_readbackpixelconfiguration->append(QString::number((u_int16_t)_pixelreadback.getWord(0),16));
+
+        }
+
+    }
+
+    on_pushButton_normalmode_clicked();
+}
+
+void MainWindow::on_pushButton_selectcolumn0_clicked()
+{
+    selectcolumn(0);
+}
+
+void MainWindow::on_pushButton_selectcolumn1_clicked()
+{
+    selectcolumn(1);
+}
+
+void MainWindow::on_pushButton_selectcolumn2_clicked()
+{
+    selectcolumn(2);
+}
+
+void MainWindow::on_pushButton_selectcolumn3_clicked()
+{
+    selectcolumn(3);
+}
+
+void MainWindow::on_pushButton_selectcolumn4_clicked()
+{
+    selectcolumn(4);
+}
+
+void MainWindow::on_pushButton_selectcolumn5_clicked()
+{
+    selectcolumn(5);
+}
+
+void MainWindow::on_pushButton_selectcolumn6_clicked()
+{
+    selectcolumn(6);
+}
+
+void MainWindow::on_pushButton_selectcolumn7_clicked()
+{
+    selectcolumn(7);
+}
+
+void MainWindow::selectcolumn(int column)
+{
+    _topix4command.setOperationCode(topix4_command::columnselection);
+    _topix4command.setData(column);
+    _topix4command.assemble();
+    _topix4control.writeToChip(_topix4command);
+    Error();
+}
+
+void MainWindow::on_pushButton_configmode_clicked()
+{
+    _topix4command.setOperationCode(topix4_command::configmodeoperation);
+    _topix4command.assemble();
+    _topix4control.writeToChip(_topix4command);
+    Error();
+}
+
+void MainWindow::on_pushButton_normalmode_clicked()
+{
+    _topix4command.setOperationCode(topix4_command::normaloperation);
+    _topix4command.assemble();
+    _topix4control.writeToChip(_topix4command);
+    Error();
+}
+
+void MainWindow::clearPixelConfigTable(QTableWidget& table, int columnwidth, int rowheight)
+{
+    table.clear();
+    table.setColumnCount(32);
+    table.setRowCount(20);
+    QStringList list;
+    list.clear();
+
+    for(int j=_pixelconfig.getMatrixRows()-1; j>-1;j--)
+    {
+        list << QString::number(j);
+    }
+    table.setVerticalHeaderLabels(list);
+
+    list.clear();
+    for(int j=_pixelconfig.getMatrixCols()-1; j>-1;j--)
+    {
+        list << QString::number(j);
+    }
+    table.setHorizontalHeaderLabels(list);
+    for(int i=0; i<32; i++)
+    {
+        table.setColumnWidth(i,columnwidth);
+    }
+
+    for(int i=0; i<20; i++)
+    {
+        table.setRowHeight(i,rowheight);
+    }
+}
 
 void MainWindow::p3testpulsfillItemTable()
 {
@@ -712,13 +1018,14 @@ void MainWindow::on_pushButton_p3testpulsdisableall_clicked()
 
 void MainWindow::on_pushButton_p3maskclear_clicked()
 {
-    //clearPixelConfigTable(*ui->tableWidget_p3masktest,20,20);
+    clearPixelConfigTable(*ui->tableWidget_p3masktest,20,20);
     p3maskfillItemTable();
 }
 
 void MainWindow::p3testpulsclear()
 {
-    //clearPixelConfigTable(*ui->tableWidget_p3testpulstest,20,20);
+
+    clearPixelConfigTable(*ui->tableWidget_p3testpulstest,20,20);
     p3testpulsfillItemTable();
 }
 
@@ -755,14 +1062,14 @@ void MainWindow::p3pdacfillItemTable()
     {
         for(unsigned int column =0 ; column < 32 ; column++)
         {
-            //QTableWidgetItem *item = new QTableWidgetItem(QString::number(_pixelconfig.getPixPDAC(column,row,true)),0);
-            QString zahl;
-            if(_pixelconfig.getPixPDACSign(column,row,true)== 1)
-            {
-                zahl.append("-");
-            }
-            zahl.append(QString::number(_pixelconfig.getPixPDAC(column,row,true)));
-            QTableWidgetItem *item = new QTableWidgetItem(zahl,0);
+            QTableWidgetItem *item = new QTableWidgetItem(QString::number(_pixelconfig.getPixPDAC(column,row,true)),0);
+            //QString zahl;
+            //if(_pixelconfig.getPixPDACSign(column,row,true)== 1)
+            //{
+            //    zahl.append("-");
+            //}
+            //zahl.append(QString::number(_pixelconfig.getPixPDAC(column,row,true)));
+            //QTableWidgetItem *item = new QTableWidgetItem(zahl,0);
             //itemcolormatrix(item);
             ui->tableWidget_p3pdactest->setItem(row,column,item);
         }
@@ -817,18 +1124,63 @@ void MainWindow::on_tableWidget_p3masktest_cellClicked(int row, int column)
     on_pushButton_p3maskapply_clicked();
 }
 
+void MainWindow::config_all_with_individual_settings()
+{
+//    bool turnon=false;
+//    if(readout==true)
+ //   {
+//        turnon=true;
+//       readout=false;
+ //   }
+
+    selectcolumn(0);
+
+    on_pushButton_configmode_clicked();
+
+    for(int sel=1;sel<_pixelconfig.getColumnCount();sel++)
+    {
+        selectcolumn(sel);
+
+        //std::cout << "_pixelconfig.getRowCount(sel) " << _pixelconfig.getRowCount(sel) << " sel " << sel <<std::endl;
+        _topix4command.setOperationCode(topix4_command::movetonextpixel);
+        _topix4command.assemble();
+
+        for(int pixel=_pixelconfig.getRowCount(sel)-1;pixel>-1;pixel--)
+            //for(int pixel=0;pixel<_pixelconfig.getRowCount(sel);pixel++)
+        {
+             std::cout << "_pixelconfig.getRowCount(sel) " << _pixelconfig.getRowCount(sel) << " sel " << sel << " pixel " << pixel <<std::endl;
+            _pixelconfig.setPixCommand(sel,pixel,topix4_command::writepixelconfiguration);
+            _pixelconfig.assemble(sel,pixel);
+            _topix4control.writeRemoteData(_pixelconfig);
+            _topix4control.writeRemoteData(_topix4command);
+            _topix4control.boardCommand(tpxctrl_value::topix4config);
+            _topix4control.read(tpx_address::sdataout);
+            _topix4control.read(tpx_address::sdataout);
+        }
+    }
+
+    on_pushButton_normalmode_clicked(); //Enters a mode that allows testing and scans and such (leaves config mode)
+
+ //   if(turnon==true)
+  //  {
+  //      readout=true;
+  //      turnon=false;
+  //  }
+    Error();
+}
+
 void MainWindow::on_pushButton_p3configtopix_clicked()
 {
     p3maskassignItemValues();
     p3pdacassignItemValues();
     p3comparatorassignItemValues();
     p3testpulsassignItemValues();
-    //config_all_with_individual_settings();
+    config_all_with_individual_settings();
 }
 
 void MainWindow::on_pushButton_p3pdacclear_clicked()
 {
-    //clearPixelConfigTable(*ui->tableWidget_p3pdactest,27,25);
+    clearPixelConfigTable(*ui->tableWidget_p3pdactest,27,25);
     p3pdacfillItemTable();
 }
 
@@ -857,7 +1209,6 @@ void MainWindow::on_pushButton_p3configtothreshold_clicked()
             _pixelconfig.setPixPDACSign(s,p,Best_DAC_Sign,false);
 
             qApp->processEvents();
-
         }
     }
     p3pdacfillItemTable();
@@ -868,8 +1219,14 @@ void MainWindow::on_pushButton_p3allclear_clicked()
 {
     on_pushButton_p3pdacclear_clicked();
     on_pushButton_p3testpulsdisableall_clicked();
-    //on_pushButton_p3comparatorclear_clicked();
+    on_pushButton_p3comparatorclear_clicked();
     on_pushButton_p3maskclear_clicked();
+}
+
+void MainWindow::on_pushButton_p3comparatorclear_clicked()
+{
+    clearPixelConfigTable(*ui->tableWidget_p3comparatortest,20,20);
+    p3comparatorfillItemTable();
 }
 
 void MainWindow::on_pushButton_p3pdacsetalltozero_clicked()
@@ -879,11 +1236,26 @@ void MainWindow::on_pushButton_p3pdacsetalltozero_clicked()
         for(int j=0; j< _pixelconfig.getRowCount(i); j++)
         {
             _pixelconfig.setPixPDAC(i,j,0,false);
-            _pixelconfig.setPixPDACSign(i,j,0,false);
+            //_pixelconfig.setPixPDACSign(i,j,0,false);
         }
     }
     on_pushButton_p3pdacclear_clicked();
 }
+
+void MainWindow::on_pushButton_p3pdacsetallto15_clicked()
+{
+    for(int i =0; i< _pixelconfig.getColumnCount(); i++)
+    {
+        for(int j=0; j< _pixelconfig.getRowCount(i); j++)
+        {
+            _pixelconfig.setPixPDAC(i,j,15,false);
+           // _pixelconfig.setPixPDACSign(i,j,0,false);
+        }
+    }
+    on_pushButton_p3pdacclear_clicked();
+}
+
+
 void MainWindow::on_tableWidget_p3pdactest_cellChanged(int row, int column)
 {
     if( ui->tableWidget_p3pdactest->item(row,column)->text().toInt()>15 ||ui->tableWidget_p3pdactest->item(row,column)->text().toInt()<-15)
@@ -892,7 +1264,6 @@ void MainWindow::on_tableWidget_p3pdactest_cellChanged(int row, int column)
         QTableWidgetItem *item = ui->tableWidget_p3pdactest->item(row,column);
         //item->setText(assamblePDAC(row,column));
         ui->tableWidget_p3pdactest->setItem(row,column,item);
-
     }
     else
     {
