@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = topix4_main
 
-INCLUDEPATH += ../../MRF/source/ /home/ikp1/esch/fairsoft/FairRoot_Mohammad_build/include/ /private/esch/external_packages/FairSoft_build/include/
+INCLUDEPATH += ../../MRF/source/ $(FAIRROOTPATH)/include/ $(SIMPATH)/include/
 
 
 DEPENDPATH += ../helper_functions.h
@@ -115,6 +115,6 @@ OBJECTS_DIR=generated_files
 
 #QMAKE_LIBDIR_FLAGS = -L/private/esch/external_packages/FairSoft_build/ -lboost_timer -lboost_system -lboost_thread
 
-LIBS += -L/private/esch/external_packages/FairSoft_build/lib -lzmq -lboost_thread -lboost_timer -lboost_system -lboost_chrono
-LIBS += -L/home/ikp1/esch/fairsoft/FairRoot_Mohammad_build/lib -lFairMQ
+LIBS += -L$(SIMPATH)/lib -lzmq -lboost_thread -lboost_timer -lboost_system -lboost_chrono
+LIBS += -L$(FAIRROOTPATH)lib -lFairMQ
 
