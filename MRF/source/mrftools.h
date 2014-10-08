@@ -42,8 +42,17 @@ u_int32_t shiftBy(const int& positions, const u_int32_t& value);
 
 unsigned int getIteratorItemCount(const std::map<std::string, TConfItem>::const_iterator& start, const std::map<std::string, TConfItem>::const_iterator& stop);
 unsigned int getIteratorItemCount(const std::map<std::string, std::map<std::string, TConfItem> >::const_iterator& start, const std::map<std::string, std::map<std::string, TConfItem> >::const_iterator& stop);
-}
 
+
+//! Converts gray encoded values to bianry values
+/*!
+\param gray Gray encoded value.
+\return The correponding binary value.
+*/
+
+u_int32_t grayToBin(u_int32_t gray);
+
+}
 
 #endif // __MRFTOOLS_H__
 
