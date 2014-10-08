@@ -18,6 +18,8 @@ public:
     DataMonitor();
     virtual ~DataMonitor();
 
+    int ReductionRate() const;
+    void setReductionRate(int ReductionRate);
 
 protected:
     virtual void Init();
@@ -27,10 +29,13 @@ private:
     TCanvas* canvas;
     TH1F* leading_Edge;
     TH1F* trailing_Edge;
-    TH2F* pixel_position;
+    TH2F* hit_map;
 
-    int counter;
+    int _counter;
+    int _ReductionCounter;
+    int _ReductionRate;
 
+    void pixeladdressToMatrixAddress(u_int32_t pixelglobaladdress, u_int32_t &matrix_row, u_int32_t &matrix_column);
 };
 
 #endif // DATAMONITOR_H
