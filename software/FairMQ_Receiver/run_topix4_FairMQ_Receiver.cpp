@@ -70,17 +70,13 @@ int main(int argc, char** argv)
 
      int numIoThreads;
      stringstream(argv[i]) >> numIoThreads;
-     topix4_receiver.SetProperty(topix4_fairmq_receiver::EventSize, numIoThreads);
+     topix4_receiver.SetProperty(topix4_fairmq_receiver::NumIoThreads, numIoThreads);
      ++i;
 
 
      topix4_receiver.SetProperty(topix4_fairmq_receiver::NumInputs, 1);
      topix4_receiver.SetProperty(topix4_fairmq_receiver::NumOutputs, 0);
-
-
      topix4_receiver.ChangeState(topix4_fairmq_receiver::INIT);
-
-
      topix4_receiver.SetProperty(topix4_fairmq_receiver::InputSocketType, argv[i], 0);
      ++i;
      int inputRcvBufSize;
