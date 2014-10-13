@@ -9,7 +9,6 @@
 #include "mrfdata_tpx4pixel.h"
 #include "mrfstrerror.h"
 #include "topix4_fairmq_readout.h"
-#include "topix4_readout_sm.h"
 
 namespace Ui {
 class MainWindow;
@@ -54,6 +53,8 @@ private:
     void selectcolumn(int column);
     void injectChargeInternalUnsync();
     void injetChargeInternalSync(int delay, int wait);
+    void measurement_tot_linearity(int start, int stop, int stepwidth, int numberofinjections);
+    void setCalLevel(int cal_level_in_DAC);
 private slots:
 
     void on_toolButton_refreshOwnIP_1_clicked();
@@ -150,6 +151,7 @@ private slots:
     void on_pushButton_topix4readccr0_clicked();
     void on_pushButton_topix4readccr1_clicked();
     void on_pushButton_topix4readccr2_clicked();
+    void on_pushButton_topix4loadcommand_richard_clicked();
 };
 
 #endif // MAINWINDOW_H

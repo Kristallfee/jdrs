@@ -77,10 +77,9 @@ void MainWindow::injectChargeInternalUnsync()
 //    _topixflags.assemble();
 //    _topixcrtl.configTopixSlowReg(_topixflags);
 
-    _topix4control.write(0x480,2);
+    _topix4control.writeOr(0x480,2);
     usleep(5);
-    _topix4control.write(0x480,0);
-
+    _topix4control.writeXor(0x480,2);
 
 //    _topix.setLocalItemValue("TestPin", 1);
 //    _topixflags.assemble();
@@ -124,10 +123,10 @@ void MainWindow::on_pushButton_stop_fairmq_thread_clicked()
 
 void MainWindow::DoFairMQReadout()
 {
-    if (_topix4control.deviceIsOpen())
-    {
-       on_pushButton_Disconnect_UDP_clicked();
-    }
+ //   if (_topix4control.deviceIsOpen())
+  //  {
+  //     on_pushButton_Disconnect_UDP_clicked();
+  //  }
 
     QStringList ownIP = ui->comboBox_ownIPAdresses_FairMQ->currentText().split(" ");
     QString connectionParameter = QString("%1,%2,%3,%4")
@@ -138,17 +137,19 @@ void MainWindow::DoFairMQReadout()
 
     FairMQTransportFactory* transportFactory = new FairMQTransportFactoryZMQ();
 
-    fairmqreadout.SetBigCounter(ui->checkBox_bigcounter->isChecked());
-    fairmqreadout.SetSaveData(ui->checkBox_savetofile->isChecked(),ui->lineEdit_savetofile_path->text());
     fairmqreadout.SetOutputWindow(ui->textEdit_Dmadata);
     fairmqreadout.SetTransport(transportFactory);
-    fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::Id, 100);
+    fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::Id, "100");
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::EventSize, ui->lineEdit_fairmq_message_size->text().toInt()); //in 40 bit words
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::NumIoThreads, 1);
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::NumInputs, 0);
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::NumOutputs, 1);
 
     fairmqreadout.ChangeState(ToPix4_FairMQ_Readout::INIT);
+
+    fairmqreadout.SetBigCounter(ui->checkBox_bigcounter->isChecked());
+    fairmqreadout.SetSaveData(ui->checkBox_savetofile->isChecked(),ui->lineEdit_savetofile_path->text().toStdString());
+
 
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputSocketType,"push" , 0);
     fairmqreadout.SetProperty(ToPix4_FairMQ_Readout::OutputSndBufSize,ui->lineEdit_fairmq_watermark->text().toInt());
@@ -405,6 +406,12 @@ void MainWindow::on_pushButton_ltc2604loadmodule4_clicked()
     on_pushButton_ltc2604clear_clicked();
 }
 
+void MainWindow::setCalLevel(int cal_level_in_DAC)
+{
+    _ltc2604.setDACValue("LTC1","DACA",cal_level_in_DAC);
+    on_pushButton_configureltc2604_clicked();
+}
+
 // *************************************************************************************
 //tab connection UDP
 // *************************************************************************************
@@ -560,9 +567,30 @@ void MainWindow::on_pushButton_topix4loadcommand_clicked()
     _topix4ccr.setLocalItemValue("FreezeStop",4);
     _topix4ccr.setLocalItemValue("CounterStopValue",4095);
 
+    on_pushButton_topix4clearcommand_clicked();
+}
+
+void MainWindow::on_pushButton_topix4loadcommand_richard_clicked()
+{
+    _topix4ccr.setCommand(topix4_ccrnumber::ccr0,32);
+    _topix4ccr.setCommand(topix4_ccrnumber::ccr1,33);
+    _topix4ccr.setCommand(topix4_ccrnumber::ccr2,34);
+
+    _topix4ccr.setLocalItemValue("CounterMode",1);
+    _topix4ccr.setLocalItemValue("CounterEnable",1);
+    _topix4ccr.setLocalItemValue("ReadoutCycleHalfSpeed",1);
+    _topix4ccr.setLocalItemValue("FreezeStop",4);
+
+    _topix4ccr.setLocalItemValue("Leak_P",1);
+    _topix4ccr.setLocalItemValue("SelectPol",1);
+    _topix4ccr.setLocalItemValue("PreEmphasisTimeStamp",1);
+    _topix4ccr.setLocalItemValue("PreEmphasisCommands",1);
+
+    _topix4ccr.setLocalItemValue("CounterStopValue",4095);
 
     on_pushButton_topix4clearcommand_clicked();
 }
+
 
 
 void MainWindow::on_pushButton_topix4readccr0_clicked()
@@ -1268,5 +1296,26 @@ void MainWindow::on_tableWidget_p3pdactest_cellChanged(int row, int column)
     else
     {
         p3pdacassignItemValues();
+    }
+}
+
+// *************************************************************************************
+// Measurements
+// *************************************************************************************
+
+void MainWindow::measurement_tot_linearity(int start, int stop, int stepwidth, int numberofinjections)
+{
+    // todo flush main fifo
+
+    // todo start state machine
+
+    for(int i=start;i<stop;i+=stepwidth)
+    {
+        setCalLevel(i);
+        for(int j=0;j< numberofinjections;j++)
+        {
+            injectChargeInternalUnsync();
+            usleep(10); // just to make sure everything is processed
+        }
     }
 }
