@@ -61,7 +61,8 @@ SOURCES += main.cpp\
 	 ../../MRF/source/mrfdata_afei3.cpp \
 	 ../../MRF/source/stringseparator.cpp \
     ../../MRF/source/mrfdata_tpx4pixel.cpp \
-    ../../MRF/source/mrfdata_tpx4data.cpp
+    ../../MRF/source/mrfdata_tpx4data.cpp \
+    ../../MRF/source/mrf_writetofile_boost.cpp
 
 HEADERS  += mainwindow.h \
 	 topix4_fairmq_readout.h \
@@ -103,7 +104,8 @@ HEADERS  += mainwindow.h \
 	 ../../MRF/source/stringseparator.h \
     ../helper_functions.h \
     ../../MRF/source/mrfdata_tpx4pixel.h \
-    ../../MRF/source/mrfdata_tpx4data.h
+    ../../MRF/source/mrfdata_tpx4data.h \
+    ../../MRF/source/mrf_writetofile_boost.h
 
 
 QMAKE_MOC = $$QMAKE_MOC -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
@@ -115,6 +117,6 @@ OBJECTS_DIR=generated_files
 
 #QMAKE_LIBDIR_FLAGS = -L/private/esch/external_packages/FairSoft_build/ -lboost_timer -lboost_system -lboost_thread
 
-LIBS += -L$(SIMPATH)/lib -lzmq -lboost_thread -lboost_timer -lboost_system -lboost_chrono
+LIBS += -L$(SIMPATH)/lib -lzmq -lboost_thread -lboost_serialization -lboost_timer -lboost_system -lboost_chrono
 LIBS += -L$(FAIRROOTPATH)lib -lFairMQ
 
