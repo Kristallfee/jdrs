@@ -4,8 +4,11 @@
 #include "FairMQDevice.h"
 #include "mrfcal_topix4.h"
 #include "QString"
-#include "../writetofile.h"
+//#include "../writetofile.h"
 #include "QTextEdit"
+#include <fstream>
+#include "mrf_writetofile_boost.h"
+#include <string>
 
 class ToPix4_FairMQ_Readout: public FairMQDevice
 {
@@ -26,7 +29,7 @@ public:
     virtual int GetProperty(const int key, const int default_ = 0, const int slot = 0);
     void SetOutputWindow(QTextEdit* window);
     void SetBigCounter(bool value);
-    void SetSaveData(bool value, QString path);
+    void SetSaveData(bool value, std::string path);
     void SetFakeDataCheck(bool value);
 
 protected:
@@ -38,15 +41,14 @@ protected:
 private:
     TMrfCal_Topix4 _topix4control;
     QTextEdit * _window;
-    WriteToFile* writetofile;
+  //  WriteToFile* writetofile;
+    TMrf_WriteToFile_Boost *writetofile_boost;
     u_int64_t previous_dataword;
     u_int64_t previous_comandoword;
-   // u_int64_t previous_le_dataword;
-   // u_int64_t previous_te_dataword;
     bool bigcounter;
     bool savedata;
     bool fakedatacheck;
-
+    std::ofstream ofs;
 };
 
 #endif // TOPIX4_FAIRMQ_READOUT_H
