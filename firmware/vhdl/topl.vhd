@@ -226,7 +226,7 @@ entity topl is
     USER_LED            : out std_logic_vector (7 downto 0);  	--! 8 GPIO LEDs
     USER_LED_C			: out std_logic;						--! Center LED
 	 USER_BUTTON_C			: in std_logic;
-    USER_SWITCH         : in  std_logic_vector (4 downto 0)		--! 8 GPIO Switches
+    USER_SWITCH         : in  std_logic_vector (7 downto 0)		--! 8 GPIO Switches
   );
 end topl;
 
@@ -632,6 +632,8 @@ begin
     -------------------------------
     DISPLAY         => open, --USER_LED,
     RX_PKG_CTR      => udp_pkg_ctr,
+	 
+	 USER_SWITCH				=> USER_SWITCH,
 
     REGISTER_ACCESS         => register_access,
     REGISTER_ADDR           => register_addr,
@@ -669,7 +671,7 @@ USER_LED_C	<= datacheck_trigger_int;
 	RESET_IN 			=> GLBL_RST,
 	GRESET      		=> open,  -- a reset from the SREGS
 	LED         		=> USER_LED,
-	USER_SWITCH 		=> USER_SWITCH,
+	--USER_SWITCH 		=> USER_SWITCH,
 	-- ----------------------- DAC ----------------------------------------- --  
 	DAC_SDI   			=>   DAC_SDI,
 	DAC_CLR   			=>   DAC_CLR,

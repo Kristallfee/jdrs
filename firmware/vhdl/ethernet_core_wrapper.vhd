@@ -91,6 +91,7 @@ entity ethernet_core_wrapper is
     -------------------------------
     DISPLAY           : out std_logic_vector (7 downto 0);
     RX_PKG_CTR        : out std_logic_vector (31 downto 0); 		--! pipe the package counter to the LCD
+	 USER_SWITCH		 : in std_logic_vector(7 downto 0);				--! User switch to set the IP and MAC address
 
     REGISTER_ACCESS         : out std_logic;            				--! a request to access the register
     REGISTER_ADDR           : out std_logic_vector(15 downto 0);  --! register address byte
@@ -259,9 +260,11 @@ architecture Behavorial of ethernet_core_wrapper is
    -- Constants used in this top level wrapper.
    ------------------------------------------------------------------------------
 
-  constant our_ip   : std_logic_vector (31 downto 0) := x"c0a8000a";    -- 192.168.0.10
-  constant our_mac  : std_logic_vector (47 downto 0) := x"000a35022e4d";
+--  constant our_ip   : std_logic_vector (31 downto 0) := x"c0a8000a";    -- 192.168.0.10
+--  constant our_mac  : std_logic_vector (47 downto 0) := x"000a35022e4d";
 
+	signal our_ip		: std_logic_vector (31 downto 0);
+	signal our_mac		: std_logic_vector (47 downto 0);
 
   ------------------------------------------------------------------------------
   -- internal signals used in this top level wrapper.
@@ -827,6 +830,10 @@ DATACHECK_TRIGGER <= datacheck_trigger_led;
   ------------------------------------------------------------------------------
   --  Instantiate the UDP and ARP modules
   ------------------------------------------------------------------------------
+
+	our_ip <= x"c0a800" & USER_SWITCH(7 downto 0);    -- 192.168.0.XX
+	our_mac <= x"000a35022e" & USER_SWITCH(7 downto 0); -- 00.0A.35.02.XX
+
 
   udp_block: UDP_Complete_nomac
   generic map (
@@ -1575,15 +1582,15 @@ DATACHECK_TRIGGER <= datacheck_trigger_led;
 			elsif ( register_dma_count_int > register_dma_count_sync ) then
 				register_write_data_int(10 downto 2) <= register_dma_count_sync(8 downto 0);
 				tx_count_target <= to_integer(unsigned(register_dma_count_sync + 1)) *5;
-          	elsif (register_dma_count_int=0) then
+      elsif (register_dma_count_int = 0) then
 				register_write_data_int(17 downto 2) <= (others => '0');
 				tx_count_target <= 5;	
 				tx_empty_transmission <= '1';
-          	else
-          	  	register_write_data_int(10 downto 2) <= register_dma_count_int(8 downto 0);
-            	tx_count_target <= to_integer(unsigned(register_dma_count_int +1)) *5;
-          	end if;
-        end if;
+    	else
+    	  register_write_data_int(10 downto 2) <= register_dma_count_int(8 downto 0);
+      	tx_count_target <= to_integer(unsigned(register_dma_count_int +1)) *5;
+    	end if;
+     end if;
 
         fifo_dma_read_en <= set_fifo_dma_read_next;
 

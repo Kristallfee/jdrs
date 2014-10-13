@@ -56,7 +56,7 @@ port (
 	RESET_IN 			: in  std_logic;
 	GRESET   			: out std_logic;	-- general reset
 	LED					: out std_logic_vector(7 downto 0);
-	USER_SWITCH			: in  std_logic_vector(4 downto 0);
+	--USER_SWITCH			: in  std_logic_vector(4 downto 0);
 	
 -- ----------------------- DAC ----------------------------------------- --  	
 	DAC_SDI   			: out std_logic;
@@ -299,7 +299,7 @@ port map (
 
 TPX_TESTP_OUT <= topixslowreg(1);
 
-TOPIX_DATA_WAIT <= topix_data_wait_int or not topixslowreg(0);
+TOPIX_DATA_WAIT <= topix_data_wait_int or topixslowreg(0);
 
 rc_we		<= P_REG and P_WR and B2SL(regadr(regadr'high downto 5) = (SM_DRP/32));
 rc_start	<= P_REG and P_WR and B2SL(regadr = (SM_DRP+31));
@@ -358,11 +358,11 @@ U_ONE_HERTZ_COUNTER : entity work.one_hertz_counter PORT MAP(
 	COUNTER_OUT 	=> one_hertz_counter_i
 );
 
-U_KNIGHT_RIDER : entity work.knight_rider PORT MAP (
-	CLK66			=> ilclk,
-	USER_SWITCH		=> USER_SWITCH,
-	LED				=> knight_rider_i
-);
+--U_KNIGHT_RIDER : entity work.knight_rider PORT MAP (
+--	CLK66			=> ilclk,
+--	USER_SWITCH		=> USER_SWITCH,
+--	LED				=> knight_rider_i
+--);
 	
 U_LTC2604: entity work.SM_LTC2604 PORT MAP(
 	BUSY 			=> ltcconfbusy,
@@ -380,7 +380,7 @@ U_LTC2604: entity work.SM_LTC2604 PORT MAP(
 
 with led_config select LED <=
 	one_hertz_counter_i 						when "00000",		-- 0
-	knight_rider_i (7 downto 0)		 			when "00001",		-- 1
+	--knight_rider_i (7 downto 0)		 			when "00001",		-- 1
 	tpx_fifo_datacount(7 downto 0) 				when "00010",		-- 2
 	ev_datacount_int(7 downto 0) 				when "00011",		-- 3
 	ev_datacount_int(15 downto 8)				when "00100",		-- 4
