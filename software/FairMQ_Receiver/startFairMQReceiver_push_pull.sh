@@ -40,4 +40,5 @@ inputSocketType="pull"
 inputRcvBufSize=$buffSize
 inputMethod="connect"
 inputAddress="tcp://localhost:5566"
-xterm -hold -e  /home/ikp1/esch/chip_readout/git_repository/jdrs/build-software-Desktop_Qt_5_3_GCC_64bit-Debug/FairMQ_Receiver/run_topix4_fairmq_receiver  $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress &
+bigcounter="0"
+xterm -hold -e  /home/ikp1/esch/chip_readout/git_repository/jdrs/build-software-Desktop_Qt_5_3_GCC_64bit-Debug/FairMQ_Receiver/run_topix4_fairmq_receiver  $ID $numIoThreads $inputSocketType $inputRcvBufSize $inputMethod $inputAddress $bigcounter &
