@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include "mrfdataadv1d.h"
 #include "mrfdataadv2d.h"
+#include "mrfdata_8b.h"
 //#include "mrfdata_tpx3data.h"
 //#include "mrfdata_chain2ltc2604.h"
 #include <iostream>
@@ -44,6 +45,7 @@ public:
     u_int32_t graytobin(u_int32_t gray);
 
 
+    void AppendToData(TMrfData_8b &data, bool writevector=false);
 private:
     struct tm *nun;
     //std::ofstream configstream;

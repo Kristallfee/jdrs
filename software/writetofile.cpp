@@ -185,6 +185,22 @@ void WriteToFile::AppendToData(TMrfDataAdv1D &data)
     }
 }
 
+void WriteToFile::AppendToData(TMrfData_8b &data, bool writevector)
+{
+    if(writevector==false)
+    {
+        for(int i=0;i< data.getNumWords();i++)
+        {
+            datastream << data.getWord(i) << " " ;
+        }
+        endl(datastream);
+    }
+    else
+    {
+
+    }
+}
+
 void WriteToFile::AppendToData(TMrfDataAdv1D::itemMap &data)
 {
     TMrfDataAdv1D::itemMap::const_iterator iter;
