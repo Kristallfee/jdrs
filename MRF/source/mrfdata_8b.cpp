@@ -22,6 +22,14 @@ TMrfData_8b::TMrfData_8b()
 {
 }
 
+TMrfData_8b::TMrfData_8b(u_int32_t _reglengthbits, u_int32_t _reglengthwords, u_int32_t _lastreglengthbits, std::vector<u_int8_t> _regdata)
+{
+    reglengthbits = _reglengthbits;
+    reglengthwords = _reglengthwords;
+    lastreglengthbits = _lastreglengthbits;
+    regdata =_regdata;
+
+}
 
 void TMrfData_8b::setNumBits(const u_int32_t& length)
 {

@@ -15,6 +15,7 @@
 #include <string>
 #include <map>
 #include <climits>
+#include <boost/serialization/vector.hpp>
 //#include "mrf_confitem.h"
 
 //! Error flags set by TMrfData_8b functions.
@@ -31,6 +32,8 @@ class TMrfData_8b
 {
 	public:
 		TMrfData_8b();
+
+		TMrfData_8b(u_int32_t _reglengthbits,u_int32_t _reglengthwords,u_int32_t _lastreglengthbits,std::vector<u_int8_t> _regdata );
 
 		//TMrfData_8b(const TMrfData_8b& rhs);
 
@@ -202,6 +205,19 @@ class TMrfData_8b
 		static const u_int32_t zeroval = 0;
 		mutable u_int32_t _bitblock;
 		mutable std::string _data;
+
+		// Allow serialization to access non-public data members
+		friend class boost::serialization::access;
+		template<class Archive>
+		void serialize(Archive & ar, const unsigned int version)
+		{
+		    ar & reglengthbits;
+		    ar & reglengthwords;
+		    ar & lastreglengthbits;
+		    ar & regdata;
+
+		}
+
 //	protected:
 		//! Internal error code.
 		/*!
