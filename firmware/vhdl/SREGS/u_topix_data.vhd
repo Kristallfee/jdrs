@@ -77,25 +77,32 @@ begin
 					state <= s_reading;
 					BUSY	<= '1';
 					data <= "000000000000000000000000000000000000000" & TPX_SDR_OUT;
+					counter <= 1;
 				else	
 					state <= s_idle;
 					BUSY	<= '0';
 				end if;
 				MODULE_FIFO_DATA_WR_EN <= '0';
 			when s_reading =>
-				if counter < 39 then 
+				if counter < 40 then 
 					state <= s_reading;
 					data <= data(38 downto 0) & TPX_SDR_OUT;
 					counter <= counter + 1;
 					MODULE_FIFO_DATA_WR_EN <= '0';
 					BUSY	<= '1';
-				else
+				elsif counter = 40 then
 					state <= s_idle;
 					counter <= 0;
 					BUSY	<= '0';
 					MODULE_FIFO_DATA_WR_EN <= '1';
 					MODULE_FIFO_DATA <= data;
-					BUSY	<= '1';
+				else
+					state <= s_idle;
+					counter <= 0;
+					BUSY	<= '0';
+					MODULE_FIFO_DATA_WR_EN <= '0';
+					MODULE_FIFO_DATA <= (others=>'0');
+					data <= (others => '0');
 				end if;
 	--		when s_finish_reading =>
 	--			MODULE_FIFO_DATA_WR_EN <= '0';
