@@ -266,6 +266,7 @@ u_int32_t TMrfGal_Udp::writeData(const mrf::addresstype& address, const TMrfData
         u_int32_t i;
         for (i = 0; i < data.getNumWords(); ++i) {
             write(address, data.getWord(i));
+            std::cout <<std::hex<<  "address " << address << " data.getWord(i) "<< data.getWord(i) << std::endl;
             if (!(lastActionSuccessful())) {
                 errcode |= mrf_error::write_data_failed;
                 break;
@@ -609,16 +610,18 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
 
         // check that the returning 32 bit integers have the correct byte order
         u_int32_t *recvSingleBlock, *returnSingleBlock;
-                   std::cout << "length "<< length << std::endl;
-                   std::cout << "nBytesRecv "<< nBytesRecv << std::endl;
+        if ( _verbose ) {
+            std::cout << "length "<< length << std::endl;
+            std::cout << "nBytesRecv "<< nBytesRecv << std::endl;
+        }
         for ( unsigned int i = 0; i < length && i < nBytesRecv; i += 4 ) {
-//            recvSingleBlock = (u_int32_t*)(dataStartAddress+i);
-//            *recvSingleBlock = ntohl(*recvSingleBlock);
+            //            recvSingleBlock = (u_int32_t*)(dataStartAddress+i);
+            //            *recvSingleBlock = ntohl(*recvSingleBlock);
             recvSingleBlock = (u_int32_t*)(&recv[i]);
             returnSingleBlock = (u_int32_t*)(dataStartAddress+i);
             *returnSingleBlock = ntohl(*recvSingleBlock);
 
-         //   std::cout << "somewhere here 2" << std::endl;
+            //   std::cout << "somewhere here 2" << std::endl;
 
             if ( _verbose ) {
                 sprintf( out, "word %d:  ", i/4 );
@@ -628,9 +631,9 @@ int TMrfGal_Udp::_readBuffer(char* const dataStartAddress, u_int32_t length, u_i
             }
         }
 
-
-        std::cout << "wordcount " << wordcount << std::endl;
-
+        if ( _verbose ) {
+            std::cout << "wordcount " << wordcount << std::endl;
+        }
         // if an address for the wordcount is given, set it to the read words
         if ( wordcount != 0 ) {
             *wordcount = (nBytesRecv/4);
