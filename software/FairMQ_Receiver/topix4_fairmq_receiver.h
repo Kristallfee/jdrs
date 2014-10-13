@@ -2,7 +2,8 @@
 #define TOPIX4_FAIRMQ_RECEIVER_H
 
 #include "FairMQDevice.h"
-#include "../writetofile.h"
+//#include "../writetofile.h"
+#include "mrf_writetofile_boost.h"
 
 class topix4_fairmq_receiver : public FairMQDevice
 {
@@ -26,10 +27,11 @@ protected:
     int fEventCounter;
 
 private:
-    WriteToFile* writetofile;
+    //WriteToFile* writetofile;
     u_int64_t previous_comandoword;
     u_int64_t previous_dataword;
     bool bigcounter;
+    TMrf_WriteToFile_Boost *writetofile_boost;
 };
 
 #endif // TOPIX4_FAIRMQ_RECEIVER_H
