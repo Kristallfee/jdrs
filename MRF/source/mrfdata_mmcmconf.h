@@ -43,6 +43,39 @@
 #define _UL(x)	x##ul
 #define FRAC_PRECISION	10
 
+//#define 	CLKIN				   125.0
+//#define 	VCO_MIN				   600.0
+//#define 	VCO_MAX				   1200.0
+//#define 	FOUT_MIN			   4.69
+//#define 	FOUT_MAX			   600
+//#define	CLKFBOUT_MULT          36
+//#define	CLKFBOUT_PHASE         0
+//#define	BANDWIDTH_LOW          true
+//#define	DIVCLK_DIVIDE          5
+//#define	CLKOUT0_DIVIDE         6
+//#define	CLKOUT0_PHASE          0
+//#define	CLKOUT0_DUTY           50000
+//#define	CLKOUT1_DIVIDE         2
+//#define	CLKOUT1_PHASE          0
+//#define	CLKOUT1_DUTY           50000
+//#define	CLKOUT2_DIVIDE         5
+//#define	CLKOUT2_PHASE          0
+//#define	CLKOUT2_DUTY           50000
+//#define	CLKOUT3_DIVIDE         5
+//#define	CLKOUT3_PHASE          0
+//#define	CLKOUT3_DUTY           50000
+//#define	CLKOUT4_DIVIDE         5
+//#define	CLKOUT4_PHASE          0
+//#define	CLKOUT4_DUTY           50000
+//#define	CLKOUT5_DIVIDE         5
+//#define	CLKOUT5_PHASE          0
+//#define	CLKOUT5_DUTY           50000
+//#define	CLKOUT6_DIVIDE         5
+//#define	CLKOUT6_PHASE          0
+//#define	CLKOUT6_DUTY   50000
+//#define _UL(x)	x##ul
+//#define FRAC_PRECISION	10
+
 namespace mmcm_address {
 static const mrf::addresstype mmcmconfigreg0 = 0x80;
 static const mrf::addresstype mmcmconfigreg1 = 0x84;
@@ -68,6 +101,32 @@ static const mrf::addresstype mmcmconfigreg20 = 0xD0;
 static const mrf::addresstype mmcmconfigreg21 = 0xD4;
 static const mrf::addresstype mmcmconfigreg22 = 0xD8;
 static const mrf::addresstype mmcmconfigregister = 0xFC;
+
+//static const mrf::addresstype mmcmconfigreg0 = 0x20;
+//static const mrf::addresstype mmcmconfigreg1 = 0x21;
+//static const mrf::addresstype mmcmconfigreg2 = 0x22;
+//static const mrf::addresstype mmcmconfigreg3 = 0x23;
+//static const mrf::addresstype mmcmconfigreg4 = 0x24;
+//static const mrf::addresstype mmcmconfigreg5 = 0x25;
+//static const mrf::addresstype mmcmconfigreg6 = 0x26;
+//static const mrf::addresstype mmcmconfigreg7 = 0x27;
+//static const mrf::addresstype mmcmconfigreg8 = 0x28;
+//static const mrf::addresstype mmcmconfigreg9 = 0x29;
+//static const mrf::addresstype mmcmconfigreg10 = 0x2a;
+//static const mrf::addresstype mmcmconfigreg11 = 0x2b;
+//static const mrf::addresstype mmcmconfigreg12 = 0x2c;
+//static const mrf::addresstype mmcmconfigreg13 = 0x2d;
+//static const mrf::addresstype mmcmconfigreg14 = 0x2e;
+//static const mrf::addresstype mmcmconfigreg15 = 0x2f;
+//static const mrf::addresstype mmcmconfigreg16 = 0x30;
+//static const mrf::addresstype mmcmconfigreg17 = 0x31;
+//static const mrf::addresstype mmcmconfigreg18 = 0x32;
+//static const mrf::addresstype mmcmconfigreg19 = 0x33;
+//static const mrf::addresstype mmcmconfigreg20 = 0x34;
+//static const mrf::addresstype mmcmconfigreg21 = 0x35;
+//static const mrf::addresstype mmcmconfigreg22 = 0x36;
+//static const mrf::addresstype mmcmconfigregister = 0x3f;
+
 }
 
 //! Lookup Table for mmcm register calculation
