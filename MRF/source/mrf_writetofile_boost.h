@@ -34,18 +34,20 @@ public:
     void writeData(TMrfData_8b *data);
     void setPathName(std::string path);
     void closeFile();
-    bool openFile(int mark);
+    bool openFile(int _mark);
 
 private:
     u_int32_t max_filesize_MB;      // Maximum Filesize in MB
     time_t timestamp;
     struct tm *nun;
     std::ofstream ofs;
-    std::string createFileName(int mark);
+    void createFileName(int mark);
     QString filename;
     std::string pathname;
     u_int32_t filecounter;
+    u_int32_t mark;
 
+    bool CheckFileSizeForNewFile();
 };
 
 #endif // MRF_WRITETOFILE_BOOST_H

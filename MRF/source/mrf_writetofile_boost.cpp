@@ -24,9 +24,9 @@ void TMrf_WriteToFile_Boost::writeData(TMrfData_8b* data)
     oa << data;
 }
 
-std::string TMrf_WriteToFile_Boost::createFileName(int mark)
+void TMrf_WriteToFile_Boost::createFileName(int mark)
 {
-    filecounter=1;
+    // filecounter=1;
     time (&timestamp);
     nun = localtime(&timestamp);
     filename.clear();
@@ -50,8 +50,13 @@ std::string TMrf_WriteToFile_Boost::createFileName(int mark)
 
     filename.append("--");
     filename.append(QString::number(mark));
-    filename.append("-data--0.txt");
+    //filename.append("-data--0.txt");
+    filename.append("-data--");
+    filename.append(QString::number(filecounter));
+    filename.append(".txt");
 
+
+    filecounter++;
 
 //    filename_datastream.clear();
 //    filename_configstream.clear();
@@ -75,8 +80,21 @@ void TMrf_WriteToFile_Boost::closeFile()
     ofs.close();
 }
 
-bool TMrf_WriteToFile_Boost::openFile(int mark)
+bool TMrf_WriteToFile_Boost::openFile(int _mark)
 {
-    createFileName(mark);
+    createFileName(_mark);
     ofs.open(filename.toLocal8Bit().data(),std::ios::binary);
+    return ofs.is_open();
+}
+
+bool TMrf_WriteToFile_Boost::CheckFileSizeForNewFile()
+{
+    ofs.flush();
+    if(ofs.tellp() > (max_filesize_MB*1000000))
+    {
+        ofs.close();
+        createFileName(mark);
+        ofs.open(filename.toLocal8Bit().data(),std::ios::binary);
+    }
+    return ofs.is_open();
 }
