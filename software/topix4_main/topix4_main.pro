@@ -118,5 +118,5 @@ OBJECTS_DIR=generated_files
 #QMAKE_LIBDIR_FLAGS = -L/private/esch/external_packages/FairSoft_build/ -lboost_timer -lboost_system -lboost_thread
 
 LIBS += -L$(SIMPATH)/lib -lzmq -lboost_thread -lboost_serialization -lboost_timer -lboost_system -lboost_chrono
-LIBS += -L$(FAIRROOTPATH)lib -lFairMQ
+LIBS += -L$(FAIRROOTPATH)/lib -lFairMQ
 

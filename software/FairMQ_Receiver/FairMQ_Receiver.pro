@@ -35,7 +35,7 @@ HEADERS += topix4_fairmq_receiver.h \
 
 INCLUDEPATH += ../../MRF/source/ $(FAIRROOTPATH)/include/ $(SIMPATH)/include/
 
-
+OBJECTS_DIR=generated_files
 
 LIBS += -L$(SIMPATH)/lib -lzmq -lboost_thread -lboost_timer -lboost_serialization -lboost_system -lboost_chrono
-LIBS += -L$(FAIRROOTPATH)lib -lFairMQ
+LIBS += -L$(FAIRROOTPATH)/lib -lFairMQ
