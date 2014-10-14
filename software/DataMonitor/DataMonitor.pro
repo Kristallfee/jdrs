@@ -27,3 +27,5 @@ exists($(ROOTSYS))
 {
 LIBS += -L $(ROOTSYS)/lib/root/ -lCore -lGraf -lHist -lMathCore -lCint -lGpad
 }
+
+OBJECTS_DIR=generated_files
