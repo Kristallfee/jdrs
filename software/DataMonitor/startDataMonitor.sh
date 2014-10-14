@@ -3,7 +3,7 @@
 if(false); then
     buffSize="50000000" # nanomsg buffer size is in bytes
 else
-    buffSize="100" # zeromq high-water mark is in messages
+    buffSize="1000" # zeromq high-water mark is in messages
 fi
 
 
